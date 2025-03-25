@@ -4,6 +4,7 @@ module net.windyweather.screenshotarchive {
 
     requires com.dlsc.formsfx;
     requires java.desktop;
+    requires java.prefs;
 
     opens net.windyweather.screenshotarchive to javafx.fxml;
     exports net.windyweather.screenshotarchive;

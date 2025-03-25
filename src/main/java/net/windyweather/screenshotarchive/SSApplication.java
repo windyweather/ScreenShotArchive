@@ -8,10 +8,24 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
+import java.util.prefs.Preferences;
+
 //make a change
 public class SSApplication extends Application {
 
-    SSController ssctrl;
+
+    private static final String WINDOW_POSITION_X = "Window_Position_X";
+    private static final String WINDOW_POSITION_Y = "Window_Position_Y";
+    private static final String WINDOW_WIDTH = "Window_Width";
+    private static final String WINDOW_HEIGHT = "Window_Height";
+    private static final double DEFAULT_X = 10;
+    private static final double DEFAULT_Y = 10;
+    private static final double DEFAULT_WIDTH = 800;
+    private static final double DEFAULT_HEIGHT = 600;
+    private static final String NODE_NAME = "ViewSwitcher";
+    private static final String BUNDLE = "Bundle";
+
+    SSController ssCtrl;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -21,18 +35,46 @@ public class SSApplication extends Application {
         stage.setScene(scene);
 
         // get the controller so we can call it with window events
-        ssctrl = (SSController) fxmlLoader.getController();
+        ssCtrl = (SSController) fxmlLoader.getController();
         stage.addEventHandler( WindowEvent.ANY, new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                ssctrl.handleWindowEvent(event);
+                ssCtrl.handleWindowEvent(event);
             }
         });
         stage.show();
+        /* very cool way to save and restore window size and position.
+          David Bell's blog
+          Found at: https://broadlyapplicable.blogspot.com/2015/02/javafx-restore-window-size-position.html
+          Thanks David Bell from February 23, 2015
+          JavaFX Restore Window Size & Position
+         */
+        // Pull the saved preferences and set the stage size and start location
 
+        Preferences pref = Preferences.userRoot().node(NODE_NAME);
+        double x = pref.getDouble(WINDOW_POSITION_X, DEFAULT_X);
+        double y = pref.getDouble(WINDOW_POSITION_Y, DEFAULT_Y);
+        double width = pref.getDouble(WINDOW_WIDTH, DEFAULT_WIDTH);
+        double height = pref.getDouble(WINDOW_HEIGHT, DEFAULT_HEIGHT);
+        stage.setX(x);
+        stage.setY(y);
+        stage.setWidth(width);
+        stage.setHeight(height);
+
+
+        // When the stage closes store the current size and window location.
+
+        stage.setOnCloseRequest((final WindowEvent event) -> {
+            Preferences preferences = Preferences.userRoot().node(NODE_NAME);
+            preferences.putDouble(WINDOW_POSITION_X, stage.getX());
+            preferences.putDouble(WINDOW_POSITION_Y, stage.getY());
+            preferences.putDouble(WINDOW_WIDTH, stage.getWidth());
+            preferences.putDouble(WINDOW_HEIGHT, stage.getHeight());
+        });
     }
 
+
     public static void main(String[] args) {
-        launch();
+        Application.launch();
     }
 }

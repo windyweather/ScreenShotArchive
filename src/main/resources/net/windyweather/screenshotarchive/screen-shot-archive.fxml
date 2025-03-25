@@ -140,7 +140,7 @@
                                                 <Insets right="10.0" />
                                             </HBox.margin>
                                         </TextField>
-                                        <Button fx:id="btnSetSourcePath" mnemonicParsing="false" text=". . ." textAlignment="CENTER" />
+                                        <Button fx:id="btnSetSourcePath" mnemonicParsing="false" onAction="#OnSetSourcePath" text=". . ." textAlignment="CENTER" />
                                     </children>
                                     <padding>
                                         <Insets top="10.0" />
@@ -161,7 +161,7 @@
                                                 <Insets right="10.0" />
                                             </HBox.margin>
                                         </TextField>
-                                        <Button fx:id="btnSetDestPath" mnemonicParsing="false" text=". . ." textAlignment="CENTER" />
+                                        <Button fx:id="btnSetDestPath" mnemonicParsing="false" onAction="#OnSetDestinPath" text=". . ." textAlignment="CENTER" />
                                     </children>
                                     <padding>
                                         <Insets top="10.0" />
@@ -212,7 +212,7 @@
                                 </HBox>
                                 <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                                     <children>
-                              <TextField fx:id="txtStatus" editable="false" HBox.hgrow="ALWAYS">
+                              <TextField fx:id="txtStatus" editable="false" onKeyPressed="#OnKeyPressedStatus" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
                                     <Insets right="40.0" />
                                  </HBox.margin>
