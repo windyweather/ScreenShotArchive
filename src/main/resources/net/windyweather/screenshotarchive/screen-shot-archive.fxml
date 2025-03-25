@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="738.0" prefWidth="809.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<SplitPane dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="738.0" prefWidth="809.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.SSController">
     <items>
         <VBox prefHeight="301.0" prefWidth="854.0">
             <children>
@@ -198,13 +198,13 @@
                                 </HBox>
                                 <HBox prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                                     <children>
-                                        <Button fx:id="btnRemovePair" mnemonicParsing="false" text="Remove Pair" />
-                                        <Button fx:id="btnAddPair" layoutX="10.0" layoutY="20.0" mnemonicParsing="false" text="Add Pair" />
-                                        <Button fx:id="btnUpdatePair" layoutX="10.0" layoutY="20.0" mnemonicParsing="false" text="Update Pair" />
-                                        <Button fx:id="btnViewSource" layoutX="114.0" layoutY="20.0" mnemonicParsing="false" text="View Source" />
-                                        <Button fx:id="btnViewDestination" layoutX="62.0" layoutY="20.0" mnemonicParsing="false" text="View Destination" />
-                                        <Button fx:id="btnCopySource" layoutX="114.0" layoutY="20.0" mnemonicParsing="false" text="Copy Source" />
-                                        <Button fx:id="btnDeleteSource" layoutX="519.0" layoutY="20.0" mnemonicParsing="false" text="Delete Source" />
+                                        <Button fx:id="btnRemovePair" mnemonicParsing="false" onAction="#OnRemovePair" text="Remove Pair" />
+                                        <Button fx:id="btnAddPair" layoutX="10.0" layoutY="20.0" mnemonicParsing="false" onAction="#btnAddPair" text="Add Pair" />
+                                        <Button fx:id="btnUpdatePair" layoutX="10.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnUpdatePair" text="Update Pair" />
+                                        <Button fx:id="btnViewSource" layoutX="114.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnViewSource" text="View Source" />
+                                        <Button fx:id="btnViewDestination" layoutX="62.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnViewDestination" text="View Destination" />
+                                        <Button fx:id="btnCopySource" layoutX="114.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnCopySource" text="Copy Source" />
+                                        <Button fx:id="btnDeleteSource" layoutX="519.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnDeleteSource" text="Delete Source" />
                                     </children>
                                     <padding>
                                         <Insets top="10.0" />
@@ -212,7 +212,7 @@
                                 </HBox>
                                 <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                                     <children>
-                                        <Button fx:id="btnCloseAppButton" mnemonicParsing="false" text="Close">
+                                        <Button fx:id="btnCloseAppButton" mnemonicParsing="false" onAction="#OnCloseAppButton" text="Close">
                                             <font>
                                                 <Font size="14.0" />
                                             </font>
@@ -235,4 +235,3 @@
         <Insets left="10.0" right="10.0" />
     </padding>
 </SplitPane>
-
