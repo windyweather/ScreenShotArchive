@@ -1,5 +1,7 @@
 package net.windyweather.screenshotarchive;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -39,7 +41,7 @@ public class SSController {
     public ScrollBar sbSlideToImage;
     public Button btnGoImagesEnd;
     public TextField txtStatus;
-    public ComboBox cbChooseFolderSuffix;
+    public ComboBox<String> cbChooseFolderSuffix;
     public TextField txtFilePrefix;
     public CheckBox chkPreserveFileNames;
     public CheckBox chkTestLogOnly;
@@ -51,9 +53,7 @@ public class SSController {
     private Label lblImageName;
 
     @FXML
-    protected void lblImageName() {
-        lblImageName.setText("Welcome to JavaFX Application!");
-    }
+
 
     public void OnMenuSavePairs(ActionEvent actionEvent) {
     }
@@ -109,6 +109,11 @@ public class SSController {
         //lblImageName.setText("Set on Window Shown");
         // Set combo box value choices
         //cbChooseFolderSuffix.
+        ObservableList<String> sol = FXCollections.observableArrayList("yyyy_MM", "", "yyyy_MM_dd");
+        cbChooseFolderSuffix.setItems(sol);
+        cbChooseFolderSuffix.getSelectionModel().selectFirst();
+        // reading defaults will not open a Pair.
+
     }
     /*
     Save the windows pos/size and save the pairs
