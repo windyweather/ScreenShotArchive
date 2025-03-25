@@ -212,6 +212,11 @@
                                 </HBox>
                                 <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                                     <children>
+                              <TextField fx:id="txtStatus" editable="false" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets right="40.0" />
+                                 </HBox.margin>
+                              </TextField>
                                         <Button fx:id="btnCloseAppButton" mnemonicParsing="false" onAction="#OnCloseAppButton" text="Close">
                                             <font>
                                                 <Font size="14.0" />
