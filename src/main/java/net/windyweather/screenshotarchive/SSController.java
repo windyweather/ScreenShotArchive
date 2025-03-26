@@ -52,6 +52,41 @@ public class SSController {
     @FXML
     private Label lblImageName;
 
+    //
+    // Do this in one place so we can easily turn it off later
+    //
+    private void printSysOut( String str ) {
+        System.out.println(str);
+    }
+
+
+    /* Which OS are we running. Not sure why we care. But maybe we do.
+     */
+    private boolean isOsWindows()
+    {
+        String osName = System.getProperty ("os.name");
+        printSysOut(osName);
+        if ( osName.contains("Windows") ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    private boolean isOsLinux()
+    {
+        String osName = System.getProperty ("os.name");
+        printSysOut(osName);
+        if ( osName.contains("Linux") ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
     @FXML
 
 
@@ -94,12 +129,6 @@ public class SSController {
     public void OnCloseAppButton(ActionEvent actionEvent) {
     }
 
-    //
-    // Do this in one place so we can easily turn it off later
-    //
-    private void printSysOut( String str ) {
-        System.out.println(str);
-    }
 
 
     /*
@@ -113,7 +142,16 @@ public class SSController {
         cbChooseFolderSuffix.setItems(sol);
         cbChooseFolderSuffix.getSelectionModel().selectFirst();
         // reading defaults will not open a Pair.
-
+        if (isOsWindows() )
+        {
+            printSysOut("Windows platform");
+        }
+        else if (isOsLinux()) {
+            printSysOut( "Linux Platform");
+        }
+        else {
+            printSysOut( "Unknown Platform");
+        }
     }
     /*
     Save the windows pos/size and save the pairs
@@ -160,28 +198,6 @@ public class SSController {
      */
     public boolean isStatusEmpty() {
         return txtStatus.getText().isEmpty();
-    }
-
-    private boolean isOsWindows()
-    {
-        String osName = System.getProperty ("os.name");
-        if ( osName.contains("Windows") ) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    private boolean isOsLinux()
-    {
-        String osName = System.getProperty ("os.name");
-        if ( osName.contains("Linux") ) {
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
 

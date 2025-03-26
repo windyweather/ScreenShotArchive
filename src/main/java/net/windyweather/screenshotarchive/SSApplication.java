@@ -21,8 +21,8 @@ public class SSApplication extends Application {
     private static final double DEFAULT_X = 10;
     private static final double DEFAULT_Y = 10;
     private static final double DEFAULT_WIDTH = 800;
-    private static final double DEFAULT_HEIGHT = 600;
-    private static final String NODE_NAME = "ViewSwitcher";
+    private static final double DEFAULT_HEIGHT = 800;
+    private static final String NODE_NAME = "ScreenShotArchive";
     private static final String BUNDLE = "Bundle";
 
     SSController ssCtrl;
