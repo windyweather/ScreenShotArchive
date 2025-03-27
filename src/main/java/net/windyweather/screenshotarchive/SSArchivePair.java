@@ -130,12 +130,12 @@ public class SSArchivePair {
 
         Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
         pref.put(sQPairName, sPairName);
-        pref.get(sQPairSrcPath, sSourcePath);
-        pref.get(sQPairDstPath, sDestinationPath);
-        pref.get(sQPairFolderSfx, sFolderSuffix);
-        pref.get(sQPairFilePfx, sFilePrefix);
-        pref.getBoolean(sQPairSearchSubFolders, bSearchSubFolders);
-        pref.getBoolean(sQPairPreserveFileNames, bPreserveFileNames);
+        pref.put(sQPairSrcPath, sSourcePath);
+        pref.put(sQPairDstPath, sDestinationPath);
+        pref.put(sQPairFolderSfx, sFolderSuffix);
+        pref.put(sQPairFilePfx, sFilePrefix);
+        pref.putBoolean(sQPairSearchSubFolders, bSearchSubFolders);
+        pref.putBoolean(sQPairPreserveFileNames, bPreserveFileNames);
 
         return true;
 
@@ -147,11 +147,8 @@ public class SSArchivePair {
     public void RemovePairFromStore( int idx ) {
 
         /*
-            Don't remove an empty pair
+          Remove the pair from Store. Ignore the local contents
          */
-        if ( sPairName.isEmpty() ) {
-            return;
-        }
         GetQualifiedPrefNames( idx );
 
         /*

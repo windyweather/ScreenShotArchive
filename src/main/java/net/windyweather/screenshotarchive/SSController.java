@@ -108,7 +108,7 @@ public class SSController {
     }
 
     /*
-        Get and put stuff stuff from / to the GUI with our test pair
+        Get and put stuff from / to the GUI with our local pair
      */
     private boolean GetPairFromGui() {
 
@@ -131,16 +131,15 @@ public class SSController {
      */
     private void PutGuiFromPair() {
 
-        //boolean bEmptyName = anArchivePair.sPairName.isEmpty();
         txtSelectedPairName.setText( anArchivePair.sPairName);
         txtSourcePath.setText(anArchivePair.sSourcePath);
         txtDestPath.setText(anArchivePair.sDestinationPath);
         cbChooseFolderSuffix.setValue( anArchivePair.sFolderSuffix);
         txtFilePrefix.setText(anArchivePair.sFilePrefix);
+        chkSearchSubFolders.setSelected(anArchivePair.bSearchSubFolders);
         chkPreserveFileNames.setSelected(anArchivePair.bPreserveFileNames);
-        // return bEmptyName;
 
-    }
+      }
 
     public void btnAddPair(ActionEvent actionEvent) {
         /*
