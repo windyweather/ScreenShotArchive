@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="738.0" prefWidth="809.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.SSController">
+<SplitPane fx:id="splitPaneOutsideContainer" dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="739.0" prefWidth="859.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.SSController">
     <items>
         <VBox prefHeight="301.0" prefWidth="854.0">
             <children>
@@ -93,12 +93,12 @@
                         </Label>
                         <HBox>
                             <children>
-                                <ListView fx:id="lvScreenShotPairs" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                <ListView fx:id="lvScreenShotPairs" onMouseClicked="#OnListViewMouseClicked" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                                 <VBox alignment="TOP_RIGHT">
                                     <children>
-                                        <Button fx:id="btnMoveSpairTop" mnemonicParsing="false" text="Top" />
-                                        <Button fx:id="btnMovePairUp" mnemonicParsing="false" text="Up" />
-                                        <Button fx:id="btnMovePairDown" mnemonicParsing="false" text="Down" />
+                                        <Button fx:id="btnMovePairTop" mnemonicParsing="false" onAction="#OnMovePairTop" text="Top" />
+                                        <Button fx:id="btnMovePairUp" mnemonicParsing="false" onAction="#OnMovePairUp" text="Up" />
+                                        <Button fx:id="btnMovePairDown" mnemonicParsing="false" onAction="#OnMovePairDown" text="Down" />
                                     </children>
                                 </VBox>
                             </children>
@@ -205,6 +205,7 @@
                                         <Button fx:id="btnViewDestination" layoutX="62.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnViewDestination" text="View Destination" />
                                         <Button fx:id="btnCopySource" layoutX="114.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnCopySource" text="Copy Source" />
                                         <Button fx:id="btnDeleteSource" layoutX="519.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnDeleteSource" text="Delete Source" />
+                              <Button fx:id="btnMakeTestPairs" layoutX="622.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnMakeTestPairs" text="Make Test Pairs" />
                                     </children>
                                     <padding>
                                         <Insets top="10.0" />

@@ -11,13 +11,25 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import static javafx.stage.WindowEvent.*;
+import java.util.prefs.Preferences;
 
-//make a change
+import static javafx.stage.WindowEvent.*;
+import static net.windyweather.screenshotarchive.SSApplication.NODE_NAME;
+import static net.windyweather.screenshotarchive.SSApplication.WINDOW_POSITION_X;
+import static net.windyweather.screenshotarchive.SSApplication.WINDOW_POSITION_Y;
+import static net.windyweather.screenshotarchive.SSApplication.WINDOW_WIDTH;
+import static net.windyweather.screenshotarchive.SSApplication.WINDOW_HEIGHT;
+
+/*
+    The controller drives the GUI or vice versa
+ */
 public class SSController {
+    private static final String FOLDER_SUFFIX_DEFAULT = "yyyy_MM";
+
     public Button btnUpdatePair;
     public Button btnRemovePair;
     public Button btnAddPair;
@@ -50,6 +62,18 @@ public class SSController {
     public Button btnSetDestPath;
     public Button btnSetSourcePath;
 
+    public Button btnMovePairUp;
+    public Button btnMovePairDown;
+    public Button btnMovePairTop;
+
+
+    public ScrollPane spImagePane;
+    public Button btnMakeTestPairs;
+    public SplitPane splitPaneOutsideContainer;
+
+    ObservableList<SSArchivePair> listPairs = FXCollections.observableArrayList();
+    public ListView<SSArchivePair> lvScreenShotPairs;
+
 
     @FXML
     private Label lblImageName;
@@ -57,7 +81,7 @@ public class SSController {
 /*
     A pair for testing
  */
-    private static final SSArchivePair anArchivePair;
+    private static SSArchivePair anArchivePair;
     static {
         // Make sure we have an SSArchivePair
         anArchivePair = new SSArchivePair();
@@ -96,6 +120,10 @@ public class SSController {
     }
 
     public void OnMenuCloseApplication(ActionEvent actionEvent) {
+        /*
+          Save stuff and close the stage to shut us down
+         */
+        CloseAppAndStage();
     }
 
     public void onAboutApplication(ActionEvent actionEvent) {
@@ -105,6 +133,50 @@ public class SSController {
     }
 
     public void onGoImagesEnd(ActionEvent actionEvent) {
+    }
+
+    /*
+        Handle events from the List View of pairs
+     */
+    public void OnListViewMouseClicked(MouseEvent mouseEvent) {
+
+        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+
+        printSysOut(String.format("OnListViewMouseClicked - click with Idx %d", idx) );
+        if ( idx == -1 ) {
+            printSysOut("OnListViewMouseClicked - No selected item");
+            ClearGuiItems();
+            return;
+        }
+        anArchivePair = listPairs.get(idx);
+
+        /*
+            now populate the GUI items
+         */
+        PutGuiFromPair();
+
+    }
+
+    public void OnMovePairTop(ActionEvent actionEvent) {
+    }
+
+    public void OnMovePairUp(ActionEvent actionEvent) {
+    }
+
+    public void OnMovePairDown(ActionEvent actionEvent) {
+    }
+
+    /*
+        Clean out the pair items from GUI
+     */
+    private void ClearGuiItems() {
+        txtSelectedPairName.setText( "");
+        txtSourcePath.setText("");
+        txtDestPath.setText("");
+        cbChooseFolderSuffix.setValue( FOLDER_SUFFIX_DEFAULT );
+        txtFilePrefix.setText("");
+        chkSearchSubFolders.setSelected( false );
+        chkPreserveFileNames.setSelected( false );
     }
 
     /*
@@ -129,7 +201,7 @@ public class SSController {
         Load up the GUI from the pair. But in case we are cleaning
         the GUI, then do it regardless
      */
-    private void PutGuiFromPair() {
+    private void PutGuiFromPair( ) {
 
         txtSelectedPairName.setText( anArchivePair.sPairName);
         txtSourcePath.setText(anArchivePair.sSourcePath);
@@ -192,21 +264,23 @@ public class SSController {
     public void OnDeleteSource(ActionEvent actionEvent) {
     }
 
-    public void OnCloseAppButton(ActionEvent actionEvent) {
-        /*
-          get the scene from any GUI item, and get window from that.
-          Then that's the stage and call close on it.
-         */
-        printSysOut("OnCloseAppButton: closing the app");
+    private void CloseAppAndStage() {
         /*
           Window close event never called. So do close stuff
           from here too.
          */
         AppCloseStuffToDo();
-
-        // Now call the stage to actually close us up
+        /*
+          get the scene from any GUI item, and get window from that.
+          Then that's the stage and call close on it.
+         */
         Stage stage = (Stage) txtSelectedPairName.getScene().getWindow();
         stage.close();
+    }
+    public void OnCloseAppButton(ActionEvent actionEvent) {
+
+        printSysOut("OnCloseAppButton: closing the app");
+        CloseAppAndStage();
     }
 
 
@@ -255,6 +329,19 @@ public class SSController {
         // write the Pairs List
         // Window pos / size are saved in SSApplication
         SavePairsList();
+
+        printSysOut("AppCloseStuffToDo: Save Window Pos/Size");
+
+        /*
+            The place this was done in the App class didn't work
+            if a menu item or button closed the app.
+         */
+        Stage stage = (Stage)splitPaneOutsideContainer.getScene().getWindow();
+        Preferences preferences = Preferences.userRoot().node(NODE_NAME);
+        preferences.putDouble(WINDOW_POSITION_X, stage.getX());
+        preferences.putDouble(WINDOW_POSITION_Y, stage.getY());
+        preferences.putDouble(WINDOW_WIDTH, stage.getWidth());
+        preferences.putDouble(WINDOW_HEIGHT, stage.getHeight());
     }
     /*
     Save the windows pos/size and save the pairs
@@ -371,5 +458,37 @@ public class SSController {
     }
 
     public void OnSetSourcePath(ActionEvent actionEvent) {
+    }
+
+
+    /*
+    Add some dummy pairs to test the list pair functions
+     */
+    static int intTestPairIdx = 0;
+
+    private SSArchivePair FillTestPair() {
+        SSArchivePair pair = new SSArchivePair();
+
+        pair.sPairName = String.format("Pair_%d", intTestPairIdx);
+        pair.sSourcePath = String.format("Source_%d", intTestPairIdx);
+        pair.sDestinationPath = String.format("Destination_%d", intTestPairIdx);
+        pair.sFolderSuffix = "yyyy_MM";
+        pair.sFilePrefix = String.format("SOMEGAME_%d", intTestPairIdx%10);
+        pair.bSearchSubFolders = (intTestPairIdx %5) == 0;
+        pair.bPreserveFileNames = (intTestPairIdx %20) == 0;
+        // All test pair names are different
+        intTestPairIdx++;
+        return pair;
+    }
+    public void OnMakeTestPairs(ActionEvent actionEvent) {
+
+        printSysOut("OnMakeTestPairs - make some test pairs");
+        for ( int i=0; i<10; i++) {
+            listPairs.add( FillTestPair() );
+        }
+        /*
+            Update the pairs list in the ListView
+         */
+        lvScreenShotPairs.setItems( listPairs );
     }
 }

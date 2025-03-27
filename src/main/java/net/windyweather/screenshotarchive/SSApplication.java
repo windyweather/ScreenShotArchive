@@ -10,14 +10,16 @@ import javafx.stage.WindowEvent;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 
+import static net.windyweather.screenshotarchive.SSController.printSysOut;
+
 //make a change
 public class SSApplication extends Application {
 
 
-    private static final String WINDOW_POSITION_X = "Window_Position_X";
-    private static final String WINDOW_POSITION_Y = "Window_Position_Y";
-    private static final String WINDOW_WIDTH = "Window_Width";
-    private static final String WINDOW_HEIGHT = "Window_Height";
+    public static final String WINDOW_POSITION_X = "Window_Position_X";
+    public static final String WINDOW_POSITION_Y = "Window_Position_Y";
+    public static final String WINDOW_WIDTH = "Window_Width";
+    public static final String WINDOW_HEIGHT = "Window_Height";
     private static final double DEFAULT_X = 10;
     private static final double DEFAULT_Y = 10;
     private static final double DEFAULT_WIDTH = 800;
@@ -61,16 +63,20 @@ public class SSApplication extends Application {
         stage.setWidth(width);
         stage.setHeight(height);
 
+        printSysOut(String.format("App Start: Restore Window Pos/Size  [%.0f,%.0f] / [%.0f,%.0f]", x,y, width, height) );
+
         /*
           Wake up the controller to restore the pairs
          */
-        SSController.printSysOut("SSApplication:start - calling SSController:RestorePairsList");
+        printSysOut("SSApplication:start - calling SSController:RestorePairsList");
         ssCtrl.RestorePairsList();
-        SSController.printSysOut("SSApplication:start - back from SSController:RestorePairsList");
+        printSysOut("SSApplication:start - back from SSController:RestorePairsList");
 
         // When the stage closes store the current size and window location.
 
         stage.setOnCloseRequest((final WindowEvent event) -> {
+
+            printSysOut("stage.setOnCloseRequest: Save Window Pos/Size");
             Preferences preferences = Preferences.userRoot().node(NODE_NAME);
             preferences.putDouble(WINDOW_POSITION_X, stage.getX());
             preferences.putDouble(WINDOW_POSITION_Y, stage.getY());

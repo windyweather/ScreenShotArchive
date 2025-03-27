@@ -177,4 +177,19 @@ public class SSArchivePair {
         bSearchSubFolders = false;
         bPreserveFileNames = false;
     }
+
+    /*
+    ToString is called to render the item for the ListView
+ */
+    @Override
+    public String toString() {
+        return String.format("PairName: " + sPairName + " Source: " + sSourcePath
+                + " Destination: " + sDestinationPath
+                + " FolderSfx: " + sFolderSuffix
+                + " FilePfx: " + sFilePrefix
+                + " SrcSubFolders: " +bSearchSubFolders.toString()
+                + " PreserveFnames: " +bPreserveFileNames.toString()
+        );
+
+    }
 }
