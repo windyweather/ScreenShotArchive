@@ -11,9 +11,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
-import java.io.File;
 
 import static javafx.stage.WindowEvent.*;
 
@@ -68,7 +67,7 @@ public class SSController {
     //
     // Do this in one place so we can easily turn it off later
     //
-    public void printSysOut( String str ) {
+    public static void printSysOut( String str ) {
         System.out.println(str);
     }
 
@@ -195,6 +194,20 @@ public class SSController {
     }
 
     public void OnCloseAppButton(ActionEvent actionEvent) {
+        /*
+          get the scene from any GUI item, and get window from that.
+          Then that's the stage and call close on it.
+         */
+        printSysOut("OnCloseAppButton: closing the app");
+        /*
+          Window close event never called. So do close stuff
+          from here too.
+         */
+        AppCloseStuffToDo();
+
+        // Now call the stage to actually close us up
+        Stage stage = (Stage) txtSelectedPairName.getScene().getWindow();
+        stage.close();
     }
 
 
@@ -234,14 +247,22 @@ public class SSController {
             printSysOut( "Unknown Platform");
         }
     }
+
     /*
-    Save the windows pos/size and save the pairs
+    break out the close stuff here so we can call it from two places
      */
-    public void OnWindowCloseRequest( WindowEvent evt) {
-        printSysOut( "ShowRunnerEvents closeOurApplication - save your stuff here" );
+    void AppCloseStuffToDo() {
+        printSysOut( "SSController: AppCloseStuffToDo - save your stuff here" );
         // write the Pairs List
         // Window pos / size are saved in SSApplication
         SavePairsList();
+    }
+    /*
+    Save the windows pos/size and save the pairs
+     */
+    public void OnWindowCloseRequest(WindowEvent evt) {
+        printSysOut("OnWindowCloseRequest: window close button");
+        AppCloseStuffToDo();
 
     }
 
@@ -321,6 +342,7 @@ public class SSController {
         else {
             setStatus("Pair idx 0 restored");
             printSysOut("Pair idx 0 restored");
+            printSysOut(String.format("anArchivePair: Src:%s -- Dst:%s", anArchivePair.sSourcePath, anArchivePair.sDestinationPath));
         }
         PutGuiFromPair();
 
@@ -339,8 +361,9 @@ public class SSController {
         */
 
         GetPairFromGui();
-        anArchivePair.PutPairToStore( 0 );
         printSysOut("SavePairsList");
+        printSysOut(String.format("anArchivePair: Src:%s -- Dst:%s", anArchivePair.sSourcePath, anArchivePair.sDestinationPath));
+        anArchivePair.PutPairToStore( 0 );
         setStatus("Pairs saved");
     }
 

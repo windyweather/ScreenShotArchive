@@ -4,6 +4,7 @@ import javafx.stage.Window;
 
 import java.util.prefs.Preferences;
 
+import static net.windyweather.screenshotarchive.SSController.printSysOut;
 import static sun.util.locale.LocaleUtils.isEmpty;
 
 
@@ -68,6 +69,13 @@ public class SSArchivePair {
     }
 
     /*
+        for Debugging. Just print out the pair we are looking at
+     */
+
+    public void PrintPair() {
+        printSysOut( String.format("PairName:%s Src:%s Dst:%s", sPairName, sSourcePath, sDestinationPath));
+    }
+    /*
         Get items from the preferences store
      */
     public Integer GetNumberPairs( ) {
@@ -96,10 +104,13 @@ public class SSArchivePair {
         sPairName = pref.get(sQPairName, "");
         sSourcePath = pref.get(sQPairSrcPath, "");
         sDestinationPath = pref.get(sQPairDstPath, "");
-        sFolderSuffix = pref.get(sQPairFolderSfx, "");
+        sFolderSuffix = pref.get(sQPairFolderSfx, "yyyy_MM");
         sFilePrefix = pref.get(sQPairFilePfx, "");
         bSearchSubFolders = pref.getBoolean(sQPairSearchSubFolders, false);
         bPreserveFileNames = pref.getBoolean(sQPairPreserveFileNames, false);
+
+        printSysOut("GetPairFromStore:");
+        PrintPair();
 
         return !sPairName.isBlank(); //!isEmpty(sPairName);
     }
@@ -108,6 +119,9 @@ public class SSArchivePair {
         Store the pair only if the Pair Name is Not Empty
      */
     public boolean PutPairToStore( int idx ) {
+
+        printSysOut("PutPairToStore:");
+        PrintPair();
 
         if ( sPairName.isEmpty() ) {
             return false;

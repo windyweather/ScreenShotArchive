@@ -31,7 +31,7 @@ public class SSApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(SSApplication.class.getResource("screen-shot-archive.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 700, 700);
-        stage.setTitle("ScreenShotArchive");
+        stage.setTitle("Screen Shot Archive");
         stage.setScene(scene);
 
         // get the controller so we can call it with window events
@@ -64,9 +64,9 @@ public class SSApplication extends Application {
         /*
           Wake up the controller to restore the pairs
          */
-        ssCtrl.printSysOut("SSApplication:start - calling SSController:RestorePairsList");
+        SSController.printSysOut("SSApplication:start - calling SSController:RestorePairsList");
         ssCtrl.RestorePairsList();
-        ssCtrl.printSysOut("SSApplication:start - back from SSController:RestorePairsList");
+        SSController.printSysOut("SSApplication:start - back from SSController:RestorePairsList");
 
         // When the stage closes store the current size and window location.
 
