@@ -4,8 +4,6 @@ import javafx.stage.Window;
 
 import java.util.prefs.Preferences;
 
-import static java.lang.Boolean.FALSE;
-import static net.windyweather.screenshotarchive.SSApplication.DEFAULT_X;
 import static sun.util.locale.LocaleUtils.isEmpty;
 
 
@@ -48,6 +46,13 @@ public class SSArchivePair {
     private static String sQPairFilePfx; // = String.format(PAIR_FILE_PFX, idx);
     private static String sQPairSearchSubFolders; // = String.format(PAIR_SEARCH_SUB_FOLDERS, idx);
     private static String sQPairPreserveFileNames; // = String.format(PAIR_PRESERVE_FILE_NAMES, idx);
+
+    /*
+        let's make one
+     */
+    public SSArchivePair(){
+
+    }
 
     /*
     based on current contents of source path, request a new path with a folder dialog
@@ -93,10 +98,10 @@ public class SSArchivePair {
         sDestinationPath = pref.get(sQPairDstPath, "");
         sFolderSuffix = pref.get(sQPairFolderSfx, "");
         sFilePrefix = pref.get(sQPairFilePfx, "");
-        bSearchSubFolders = pref.getBoolean(sQPairSearchSubFolders, FALSE);
-        bPreserveFileNames = pref.getBoolean(sQPairPreserveFileNames, FALSE);
+        bSearchSubFolders = pref.getBoolean(sQPairSearchSubFolders, false);
+        bPreserveFileNames = pref.getBoolean(sQPairPreserveFileNames, false);
 
-        return !isEmpty(sPairName);
+        return !sPairName.isBlank(); //!isEmpty(sPairName);
     }
 
     /*
@@ -125,7 +130,7 @@ public class SSArchivePair {
     /*
         Remove this pair from the Pref Store
      */
-    public void DeletePairFromStore( int idx ) {
+    public void RemovePairFromStore( int idx ) {
 
         /*
             Don't remove an empty pair
@@ -147,5 +152,18 @@ public class SSArchivePair {
         pref.remove(sQPairSearchSubFolders);
         pref.remove(sQPairPreserveFileNames);
 
+    }
+
+    /*
+      Clear out fields in the Pair Object
+     */
+    public void ClearPair( ) {
+        sPairName = "";
+        sSourcePath = "";
+        sDestinationPath = "";
+        sFolderSuffix = "";
+        sFilePrefix = "";
+        bSearchSubFolders = false;
+        bPreserveFileNames = false;
     }
 }

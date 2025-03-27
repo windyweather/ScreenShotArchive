@@ -61,6 +61,12 @@ public class SSApplication extends Application {
         stage.setWidth(width);
         stage.setHeight(height);
 
+        /*
+          Wake up the controller to restore the pairs
+         */
+        ssCtrl.printSysOut("SSApplication:start - calling SSController:RestorePairsList");
+        ssCtrl.RestorePairsList();
+        ssCtrl.printSysOut("SSApplication:start - back from SSController:RestorePairsList");
 
         // When the stage closes store the current size and window location.
 

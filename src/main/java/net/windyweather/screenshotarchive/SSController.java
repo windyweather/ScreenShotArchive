@@ -13,14 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 
-import javax.swing.*;
-
-import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
 
 import static javafx.stage.WindowEvent.*;
 
@@ -41,21 +34,41 @@ public class SSController {
     public ScrollBar sbSlideToImage;
     public Button btnGoImagesEnd;
     public TextField txtStatus;
+
+    /*
+        GUI fields for the pair
+     */
+    public TextField txtSelectedPairName;
+    public TextField txtSourcePath;
+    public TextField txtDestPath;
+    public CheckBox chkSearchSubFolders;
     public ComboBox<String> cbChooseFolderSuffix;
     public TextField txtFilePrefix;
     public CheckBox chkPreserveFileNames;
+
     public CheckBox chkTestLogOnly;
-    public TextField txtDestPath;
+
     public Button btnSetDestPath;
     public Button btnSetSourcePath;
-    public TextField txtSourcePath;
+
+
     @FXML
     private Label lblImageName;
+
+/*
+    A pair for testing
+ */
+    private static final SSArchivePair anArchivePair;
+    static {
+        // Make sure we have an SSArchivePair
+        anArchivePair = new SSArchivePair();
+    }
+
 
     //
     // Do this in one place so we can easily turn it off later
     //
-    private void printSysOut( String str ) {
+    public void printSysOut( String str ) {
         System.out.println(str);
     }
 
@@ -66,24 +79,14 @@ public class SSController {
     {
         String osName = System.getProperty ("os.name");
         printSysOut(osName);
-        if ( osName.contains("Windows") ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return osName.contains("Windows");
     }
 
     private boolean isOsLinux()
     {
         String osName = System.getProperty ("os.name");
         printSysOut(osName);
-        if ( osName.contains("Linux") ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return osName.contains("Linux");
     }
 
 
@@ -105,13 +108,78 @@ public class SSController {
     public void onGoImagesEnd(ActionEvent actionEvent) {
     }
 
+    /*
+        Get and put stuff stuff from / to the GUI with our test pair
+     */
+    private boolean GetPairFromGui() {
+
+        anArchivePair.sPairName = txtSelectedPairName.getText();
+        if (anArchivePair.sPairName.isEmpty()) {
+            return false;
+        }
+        anArchivePair.sSourcePath = txtSourcePath.getText();
+        anArchivePair.sDestinationPath = txtDestPath.getText();
+        anArchivePair.sFolderSuffix = cbChooseFolderSuffix.getValue();
+        anArchivePair.sFilePrefix = txtFilePrefix.getText();
+        anArchivePair.bSearchSubFolders = chkSearchSubFolders.isSelected();
+        anArchivePair.bPreserveFileNames = chkPreserveFileNames.isSelected();
+        return true;
+    }
+
+    /*
+        Load up the GUI from the pair. But in case we are cleaning
+        the GUI, then do it regardless
+     */
+    private void PutGuiFromPair() {
+
+        //boolean bEmptyName = anArchivePair.sPairName.isEmpty();
+        txtSelectedPairName.setText( anArchivePair.sPairName);
+        txtSourcePath.setText(anArchivePair.sSourcePath);
+        txtDestPath.setText(anArchivePair.sDestinationPath);
+        cbChooseFolderSuffix.setValue( anArchivePair.sFolderSuffix);
+        txtFilePrefix.setText(anArchivePair.sFilePrefix);
+        chkPreserveFileNames.setSelected(anArchivePair.bPreserveFileNames);
+        // return bEmptyName;
+
+    }
+
     public void btnAddPair(ActionEvent actionEvent) {
+        /*
+            Test with index zero
+         */
+        if ( !GetPairFromGui() ) {
+            setStatus("Enter a path name first");
+            return;
+        }
+        if (!anArchivePair.PutPairToStore( 0 ) ) {
+            setStatus("Error writing pair to store");
+        }
+        setStatus("Pair Written to Store with Idx 0");
+
     }
 
     public void OnRemovePair(ActionEvent actionEvent) {
+        /*
+          Test Remove Pair from Store
+         */
+        anArchivePair.RemovePairFromStore( 0 );
+        anArchivePair.ClearPair();
+        PutGuiFromPair();
+        setStatus("Pair idx 0 removed from Store");
     }
 
     public void OnUpdatePair(ActionEvent actionEvent) {
+        /*
+            Test with Index zero
+         */
+        if ( anArchivePair.GetPairFromStore( 0 ) ) {
+            PutGuiFromPair();
+            setStatus("Pair read from Store with Idx 0");
+        }
+        else {
+            setStatus("No Pair in Store with Idx 0");
+        }
+
     }
 
     public void OnViewSource(ActionEvent actionEvent) {
@@ -135,13 +203,26 @@ public class SSController {
     Go find our saved windows pos/size and saved pairs
      */
     public void OnWindowShown( WindowEvent evt) {
-        //lblImageName.setText("Set on Window Shown");
-        // Set combo box value choices
-        //cbChooseFolderSuffix.
+
+        // initialize combo box choices
         ObservableList<String> sol = FXCollections.observableArrayList("yyyy_MM", "", "yyyy_MM_dd");
         cbChooseFolderSuffix.setItems(sol);
         cbChooseFolderSuffix.getSelectionModel().selectFirst();
-        // reading defaults will not open a Pair.
+
+        /*
+          Woops Too early to do this here.
+          The SSArchivePair is not yet set up
+          we will call it after we restore the windows pos/size
+          */
+        /*
+        // reading Pairs will not open a Pair.
+        printSysOut("OnWindowShown - call RestorePairsList()");
+        RestorePairsList();
+         */
+
+        /*
+          We don't care what OS, but just check in case later we care
+         */
         if (isOsWindows() )
         {
             printSysOut("Windows platform");
@@ -158,8 +239,9 @@ public class SSController {
      */
     public void OnWindowCloseRequest( WindowEvent evt) {
         printSysOut( "ShowRunnerEvents closeOurApplication - save your stuff here" );
-        // write the defaults file
-        saveDefaultsFile();
+        // write the Pairs List
+        // Window pos / size are saved in SSApplication
+        SavePairsList();
 
     }
 
@@ -202,12 +284,12 @@ public class SSController {
 
 
 
-    //
+    /*
     // use the java System.Properties class for ini files
     // and write them in XML format.
     // Both the default file and the show files are stored in this way.
-    //
-
+    */
+/*
     private String propertyFilePathPrefix()
     {
         return System.getProperty("user.home")+ File.separator+".windyweather";
@@ -217,49 +299,49 @@ public class SSController {
     {
         return propertyFilePathPrefix() + File.separator+"ScreenShotArchiveDefaults.xml";
     }
-
+*/
 
     //
-    // Restore the Defaults File from XML
+    // Restore the Pair List File from Preferences
     //
-    private void restoreDefaultsFile()
-    {
+    public void RestorePairsList() {
         /*
         use preferences class to do this
          */
+        printSysOut("RestorePairsList starting");
 
-
-
-        /*
-        some defaults
+         /*
+          For testing, just read the first pair and stuff it in the GUI
          */
-        /*
-        String sImpressPath = defProps.getProperty("ImpressPath");
-        String sImpressOptions = defProps.getProperty("ImpressOptions");
-        String sShowPath = defProps.getProperty("ShowPath");
+        if (!anArchivePair.GetPairFromStore(0)) {
+            anArchivePair.ClearPair();
+            setStatus("No pairs to restore");
+            printSysOut( "No pairs to restore");
+        }
+        else {
+            setStatus("Pair idx 0 restored");
+            printSysOut("Pair idx 0 restored");
+        }
+        PutGuiFromPair();
 
-        if ( 0 != sImpressPath.length() ) {
-            tfImpressPath.setText(sImpressPath);
+        printSysOut("RestorePairsList ");
+        setStatus("Pairs restored");
         }
-        if ( 0 != sImpressOptions.length() ) {
-            tfOptions.setText(sImpressOptions);
-        }
-        if ( 0 != sShowPath.length() ) {
-            tfShowPath.setText( sShowPath );
-        }
-*/
-        printSysOut("restoreDefaultsFile ");
-        //defProps.list(System.out);
-        setStatus("Defaults restored");
-    }
 
     //
     // store the gui to the defaults file
     //
-    private void saveDefaultsFile()
+    private void SavePairsList()
     {
-       // use Preferences class
-        setStatus("Defaults saved");
+       /*
+        use Preferences class
+        For testing just use idx 0
+        */
+
+        GetPairFromGui();
+        anArchivePair.PutPairToStore( 0 );
+        printSysOut("SavePairsList");
+        setStatus("Pairs saved");
     }
 
 
