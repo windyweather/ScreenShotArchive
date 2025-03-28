@@ -73,7 +73,10 @@ public class SSApplication extends Application {
         printSysOut("SSApplication:start - back from SSController:RestorePairsList");
 
         // When the stage closes store the current size and window location.
-
+        /*
+            the only problem with this is that when a button or menu item is used to close the app, no
+            window event occurs. But this does catch the X at the top of the window, which those do not.
+         */
         stage.setOnCloseRequest((final WindowEvent event) -> {
 
             printSysOut("stage.setOnCloseRequest: Save Window Pos/Size");
