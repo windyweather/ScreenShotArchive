@@ -12,9 +12,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.File;
 import java.util.prefs.Preferences;
 
 import static javafx.stage.WindowEvent.*;
@@ -685,11 +687,75 @@ public class SSController {
         setStatus("Pairs saved");
     }
 
-
+    /*
+        Use directoryChooser dialogs launched from stage.
+     */
     public void OnSetDestinPath(ActionEvent actionEvent) {
+        /*
+            Get a path based on the last path we've seen
+         */
+        Stage stage = (Stage) txtSelectedPairName.getScene().getWindow();
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Set the Destination Path");
+        String lastPath = txtDestPath.getText();
+        if (!lastPath.isBlank()) {
+            File aFile = new File(lastPath);
+            // do we have a valid path to a folder here?
+            if ( aFile.isDirectory() ) {
+                dirChooser.setInitialDirectory(aFile);
+            }
+        }
+        /*
+           We either set the initial path if we had one
+           or we'll just go in blind and let the user
+           navigate where he/she wants.
+           Launch the chooser dialog and then stuff
+           the result into the source path
+       */
+        File selDir = dirChooser.showDialog(( stage ));
+        /*
+            make sure we got something back otherwise just ignore it
+         */
+        if ( selDir != null ) {
+            txtDestPath.setText(selDir.getAbsolutePath());
+            setStatus("Destination Path Set");
+        } else {
+            setStatus("No path selected");
+        }
     }
 
     public void OnSetSourcePath(ActionEvent actionEvent) {
+        /*
+            Get a path based on the last path we've seen
+         */
+        Stage stage = (Stage) txtSelectedPairName.getScene().getWindow();
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Set the Source Path");
+        String lastPath = txtSourcePath.getText();
+        if (!lastPath.isBlank()) {
+            File aFile = new File(lastPath);
+            // do we have a valid path to a folder here?
+            if ( aFile.isDirectory() ) {
+                dirChooser.setInitialDirectory(aFile);
+            }
+        }
+        /*
+           We either set the initial path if we had one
+           or we'll just go in blind and let the user
+           navigate where he/she wants.
+           Launch the chooser dialog and then stuff
+           the result into the source path
+       */
+        File selDir = dirChooser.showDialog(( stage ));
+        /*
+            make sure we got something back otherwise just ignore it
+         */
+        if ( selDir != null ) {
+            txtSourcePath.setText(selDir.getAbsolutePath());
+            setStatus("Source Path Set");
+        } else {
+            setStatus("No path selected");
+        }
     }
 
 
