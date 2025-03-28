@@ -48,7 +48,7 @@ public class SSApplication extends Application {
         /* very cool way to save and restore window size and position.
           David Bell's blog
           Found at: https://broadlyapplicable.blogspot.com/2015/02/javafx-restore-window-size-position.html
-          Thanks David Bell from February 23, 2015
+          Thanks David Bell from February 23, 2015,
           JavaFX Restore Window Size & Position
          */
         // Pull the saved preferences and set the stage size and start location
