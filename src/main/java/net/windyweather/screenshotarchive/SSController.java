@@ -146,6 +146,7 @@ public class SSController {
         if ( idx == -1 ) {
             printSysOut("OnListViewMouseClicked - No selected item");
             ClearGuiItems();
+            setStatus("No pair selected");
             return;
         }
         anArchivePair = listPairs.get(idx);
@@ -154,16 +155,61 @@ public class SSController {
             now populate the GUI items
          */
         PutGuiFromPair();
-
+        setStatus("Pair selected");
     }
 
+    /*
+        Move a pair to the top of the list
+        It must be the most frequent game you play
+     */
     public void OnMovePairTop(ActionEvent actionEvent) {
+        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        if ( idx == 0 ) {
+            setStatus( "Pair is already at the top of the list");
+            printSysOut("OnMovePairTop - already at top");
+            return;
+        }
+        printSysOut(String.format("OnMovePairTop - moving idx %d to top", idx ) );
+        SSArchivePair pair = listPairs.get(idx);
+        listPairs.remove(idx);
+        listPairs.addFirst(pair );
+        SelectAndFocusIndex( 0);
+        setStatus("Pair moved to top of list");
+
     }
 
     public void OnMovePairUp(ActionEvent actionEvent) {
+        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        if ( idx == 0 ) {
+            // already at top so we are done
+            printSysOut(String.format("OnMovePairUp - idx %d already at top", idx ) );
+            SelectAndFocusIndex( idx );
+            setStatus("Pair already at top of list");
+            return;
+        }
+        printSysOut(String.format("OnMovePairUp - moving idx %d Up one item", idx ) );
+        SSArchivePair pair = listPairs.get(idx);
+        listPairs.remove(idx);
+        listPairs.add( idx-1, pair);
+        SelectAndFocusIndex( idx-1);
+        setStatus("Pair moved up one in the list");
     }
 
     public void OnMovePairDown(ActionEvent actionEvent) {
+        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        if ( (idx+1) == listPairs.size() ) {
+            // already at bottom so we are done
+            printSysOut(String.format("OnMovePairDown - idx %d already at bottom", idx ) );
+            SelectAndFocusIndex(idx);
+            setStatus("Pair is already at the bottom of the list");
+            return;
+        }
+        printSysOut(String.format("OnMovePairDown - moving idx %d Down one item", idx ) );
+        SSArchivePair pair = listPairs.get(idx);
+        listPairs.remove(idx);
+        listPairs.add( idx+1, pair);
+        SelectAndFocusIndex( idx+1);
+        setStatus("Pair moved down one in the list");
     }
 
     /*
@@ -213,43 +259,140 @@ public class SSController {
 
       }
 
+    /*
+    Make sure item of interest is selected and visible
+    */
+    private void SelectAndFocusIndex( int idx ) {
+        lvScreenShotPairs.getSelectionModel().select(idx);
+        if (!lvScreenShotPairs.isVisible() ){
+            lvScreenShotPairs.getFocusModel().focus(idx);
+            lvScreenShotPairs.scrollTo( idx);
+        }
+        lvScreenShotPairs.scrollTo( idx);
+    }
+
+    /*
+        Just print some pair so we know what's up
+     */
+    private void PrintAPair(String sWhich, SSArchivePair pair)
+    {
+        printSysOut(String.format("A Pair %s with name %s",sWhich, pair.sPairName));
+    }
+
+    /*
+        Assume we have just done a GetPairFromGUI so anArchivePair
+        is loaded up.
+     */
+    private SSArchivePair MakePairForList() {
+        SSArchivePair pair = new SSArchivePair();
+
+        pair.sPairName = anArchivePair.sPairName;
+        pair.sSourcePath = anArchivePair.sSourcePath;
+        pair.sDestinationPath = anArchivePair.sDestinationPath;
+        pair.sFolderSuffix = anArchivePair.sFolderSuffix;
+        pair.sFilePrefix = anArchivePair.sFilePrefix;
+        pair.bSearchSubFolders = anArchivePair.bSearchSubFolders;
+        pair.bPreserveFileNames = anArchivePair.bSearchSubFolders;
+        // return the manually copied pair
+        return pair;
+    }
+    /*
+        Add a new pair at the end of the list and
+        then select and focus it
+     */
     public void btnAddPair(ActionEvent actionEvent) {
         /*
-            Test with index zero
+            Need to have a pathname. Not Unique, but still
          */
         if ( !GetPairFromGui() ) {
             setStatus("Enter a path name first");
             return;
         }
-        if (!anArchivePair.PutPairToStore( 0 ) ) {
-            setStatus("Error writing pair to store");
-        }
-        setStatus("Pair Written to Store with Idx 0");
-
-    }
-
-    public void OnRemovePair(ActionEvent actionEvent) {
         /*
-          Test Remove Pair from Store
+            Add an item to the end of the listPairs.
+            We don't check for duplicate names.
+            Then select and focus on the item we just
+            added at the end of the list
          */
-        anArchivePair.RemovePairFromStore( 0 );
-        anArchivePair.ClearPair();
-        PutGuiFromPair();
-        setStatus("Pair idx 0 removed from Store");
+        printSysOut(("btnAddPair - Add a pair from GUI at the end of list"));
+        PrintAPair( "anArchivePair", anArchivePair);
+        SSArchivePair aPair = MakePairForList();
+        PrintAPair( "aPair", aPair );
+        listPairs.addLast( aPair );
+        /*
+            Gotta tell the ListView about the list again or once?
+            Anyway, apparently every time.
+         */
+        lvScreenShotPairs.setItems( listPairs );
+        int idx = listPairs.size();
+        SelectAndFocusIndex( idx+1);
+        setStatus("Pair added to list");
     }
 
+    /*
+        remove a pair from the ListView
+     */
+    public void OnRemovePair(ActionEvent actionEvent) {
+
+        /*
+            Find the selected item in the ListView and then
+            remove it from the Observable list. The Listview
+            will update automatically
+            This does not remove it from the store.
+            Assume whole list will be saved on close, or
+            user will "Save Pairs" to update the store.
+         */
+        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        if (idx == -1)
+        {
+            setStatus("Select a pair in list first");
+            return;
+        }
+        listPairs.remove( idx );
+        ClearGuiItems();
+        anArchivePair.ClearPair();
+        setStatus(String.format("Pair idx %d removed from list", idx) );
+    }
+
+    /*
+        Replace the contents of the currently selected pair in the list
+        with the contents of the GUI fields
+     */
     public void OnUpdatePair(ActionEvent actionEvent) {
         /*
-            Test with Index zero
+         Copy GUI back into the local pair, and then
+         put a copy in the listPairs to update the ListView.
          */
-        if ( anArchivePair.GetPairFromStore( 0 ) ) {
-            PutGuiFromPair();
-            setStatus("Pair read from Store with Idx 0");
-        }
-        else {
-            setStatus("No Pair in Store with Idx 0");
+        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        if (idx == -1)
+        {
+            setStatus("Select a pair in list first");
+            return;
         }
 
+        /*
+            Need to have a pair name. Not Unique, but still
+         */
+        if ( !GetPairFromGui() ) {
+            setStatus("Enter a pair name first");
+            return;
+        }
+        /*
+           Replace the currently selected item in the list
+         */
+        printSysOut(("btnUpdatePair - Update a selected pair in the list from the GUI"));
+        PrintAPair( "anArchivePair", anArchivePair);
+        SSArchivePair aPair = MakePairForList();
+        PrintAPair( "aPair", aPair );
+        listPairs.remove(idx);
+        listPairs.add( idx, aPair );
+        /*
+            Gotta tell the ListView about the list again or once?
+            Anyway, apparently every time.
+         */
+        lvScreenShotPairs.setItems( listPairs );
+        SelectAndFocusIndex( idx);
+        setStatus("Pair updated in the list");
     }
 
     public void OnViewSource(ActionEvent actionEvent) {
