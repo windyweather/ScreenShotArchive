@@ -76,11 +76,16 @@ public class SSArchivePair {
         printSysOut( String.format("PairName:%s Src:%s Dst:%s", sPairName, sSourcePath, sDestinationPath));
     }
     /*
-        Get items from the preferences store
+        Get / Put the number of pairs in the preferences store
      */
-    public Integer GetNumberPairs( ) {
+    public int GetNumberPairs( ) {
         Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
         return pref.getInt(NUMBER_PAIRS, 0);
+    }
+
+    public void PutNumberPairs( int numPairs ){
+        Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
+        pref.putInt( NUMBER_PAIRS, numPairs );
     }
 
     /*
@@ -144,7 +149,7 @@ public class SSArchivePair {
     /*
         Remove this pair from the Pref Store
      */
-    public void RemovePairFromStore( int idx ) {
+    private void RemovePairFromStore( int idx ) {
 
         /*
           Remove the pair from Store. Ignore the local contents
@@ -166,6 +171,16 @@ public class SSArchivePair {
     }
 
     /*
+        Clear out old pairs from the store when we have none to save
+     */
+    public void ClearPairStore( int numPairs ) {
+
+        for ( int i=0; i < numPairs; i++) {
+            RemovePairFromStore( i );
+        }
+    }
+
+    /*
       Clear out fields in the Pair Object
      */
     public void ClearPair( ) {
@@ -184,11 +199,13 @@ public class SSArchivePair {
     @Override
     public String toString() {
         return String.format("PairName: " + sPairName + " Source: " + sSourcePath
+                /*
                 + " Destination: " + sDestinationPath
                 + " FolderSfx: " + sFolderSuffix
                 + " FilePfx: " + sFilePrefix
                 + " SrcSubFolders: " +bSearchSubFolders.toString()
                 + " PreserveFnames: " +bPreserveFileNames.toString()
+                */
         );
 
     }

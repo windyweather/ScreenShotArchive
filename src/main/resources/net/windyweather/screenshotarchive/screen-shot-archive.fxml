@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane fx:id="splitPaneOutsideContainer" dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="739.0" prefWidth="859.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.SSController">
+<SplitPane fx:id="splitPaneOutsideContainer" dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="740.0" prefWidth="861.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.SSController">
     <items>
         <VBox prefHeight="301.0" prefWidth="854.0">
             <children>
@@ -186,11 +186,6 @@
                                                 <Insets left="10.0" />
                                             </padding>
                                         </CheckBox>
-                                        <CheckBox fx:id="chkTestLogOnly" mnemonicParsing="false" text="Test - Log Only">
-                                            <padding>
-                                                <Insets left="10.0" />
-                                            </padding>
-                                        </CheckBox>
                                     </children>
                                     <padding>
                                         <Insets top="10.0" />
@@ -205,12 +200,24 @@
                                         <Button fx:id="btnViewDestination" layoutX="62.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnViewDestination" text="View Destination" />
                                         <Button fx:id="btnCopySource" layoutX="114.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnCopySource" text="Copy Source" />
                                         <Button fx:id="btnDeleteSource" layoutX="519.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnDeleteSource" text="Delete Source" />
-                              <Button fx:id="btnMakeTestPairs" layoutX="622.0" layoutY="20.0" mnemonicParsing="false" onAction="#OnMakeTestPairs" text="Make Test Pairs" />
                                     </children>
                                     <padding>
                                         <Insets top="10.0" />
                                     </padding>
                                 </HBox>
+                        <HBox alignment="TOP_RIGHT" prefHeight="60.0" prefWidth="200.0">
+                           <children>
+                                        <CheckBox fx:id="chkTestLogOnly" mnemonicParsing="false" onAction="#OnTestLogOnly" text="Test - Log Only">
+                                            <padding>
+                                                <Insets left="10.0" top="5.0" />
+                                            </padding>
+                                        </CheckBox>
+                              <Button fx:id="btnMakeTestPairs" mnemonicParsing="false" onAction="#OnMakeTestPairs" text="Make Test Pairs">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin></Button>
+                           </children>
+                        </HBox>
                                 <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
                                     <children>
                               <TextField fx:id="txtStatus" editable="false" onKeyPressed="#OnKeyPressedStatus" HBox.hgrow="ALWAYS">

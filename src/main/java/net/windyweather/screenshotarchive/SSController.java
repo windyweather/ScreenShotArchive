@@ -115,8 +115,21 @@ public class SSController {
 
     @FXML
 
-
+    /*
+        Allow manually store pairs at any time,
+        not just on close
+     */
     public void OnMenuSavePairs(ActionEvent actionEvent) {
+        // Just save our pairs
+        int numPairs = listPairs.size();
+        // Always update store since if there are none we clear the store
+        SavePairsList();
+        if ( numPairs > 0 ) {
+
+            setStatus(String.format("%d Pairs saved", numPairs) );
+        } else {
+            setStatus("No Pairs to Save");
+        }
     }
 
     public void OnMenuCloseApplication(ActionEvent actionEvent) {
@@ -437,7 +450,10 @@ public class SSController {
         ObservableList<String> sol = FXCollections.observableArrayList("yyyy_MM", "", "yyyy_MM_dd");
         cbChooseFolderSuffix.setItems(sol);
         cbChooseFolderSuffix.getSelectionModel().selectFirst();
-
+        /*
+        show or hide the make test pairs button
+         */
+        btnMakeTestPairs.setVisible( chkTestLogOnly.isSelected() );
         /*
           Woops Too early to do this here.
           The SSArchivePair is not yet set up
@@ -555,12 +571,84 @@ public class SSController {
     // Restore the Pair List File from Preferences
     //
     public void RestorePairsList() {
-        /*
-        use preferences class to do this
-         */
-        printSysOut("RestorePairsList starting");
 
-         /*
+        printSysOut("RestorePairsList starting");
+        /*
+            All the methods to restore are in the SSArchivePair class
+         */
+        int numPairs = anArchivePair.GetNumberPairs();
+        printSysOut(String.format("%d pairs found in store", numPairs));
+
+        for (int i = 0; i < numPairs; i++) {
+            if (!anArchivePair.GetPairFromStore(i)) {
+                printSysOut(String.format("Missing pair %d", i));
+            }
+            else {
+                printSysOut(String.format("Found Pair %d in Store", i));
+                PrintAPair("anArchivePair", anArchivePair);
+                SSArchivePair aPair = MakePairForList();
+                listPairs.addLast(aPair);
+            }
+        }
+
+        /*
+            Gotta tell the ListView about the list again or once?
+            Anyway, apparently every time.
+            Then select and focus on first one
+            ok if none, I guess.
+         */
+        lvScreenShotPairs.setItems(listPairs);
+        int numFound = listPairs.size();
+        if (numFound != 0) {
+            SelectAndFocusIndex( 0);
+            setStatus(String.format("%d pairs restored", numFound));
+        } else {
+            setStatus("No pairs found to restore");
+        }
+    }
+
+    /*
+        Save the list of pairs in the store
+     */
+    private void SavePairsList() {
+        printSysOut("SavePairsList - starting");
+        // see how many pairs we have to save
+        int numPairs = listPairs.size();
+        if (numPairs == 0 ) {
+            // clear items from the store just to clean it out
+            // There might be stuff left in the store, but we have
+            // no pairs now.
+            int oldPairs = anArchivePair.GetNumberPairs();
+            if (oldPairs != 0) {
+                printSysOut(String.format("No Pairs to save. Clearing Store of %d old pairs", oldPairs) );
+                anArchivePair.ClearPairStore(oldPairs);
+            } else {
+                printSysOut("No old pairs to clear from store");
+            }
+            /*
+                Notice that if we store fewer than we had before,
+                we leave the few at the end in the store.
+                Not a problem I think.
+             */
+            // make sure we update the store to say none
+            anArchivePair.PutNumberPairs( numPairs );
+            printSysOut("Store cleared");
+            return;
+        }
+        for (int i=0; i < numPairs; i++) {
+            SSArchivePair pair = listPairs.get(i);
+            PrintAPair( "Storing Pair", pair);
+            pair.PutPairToStore( i );
+        }
+        anArchivePair.PutNumberPairs( numPairs );
+        printSysOut(String.format("SavePairsList - complete %d pairs", numPairs) );
+    }
+
+    /*
+    Just keep this code for testing if we need it
+     */
+    void RestoreAPairForTesting(){
+        /*
           For testing, just read the first pair and stuff it in the GUI
          */
         if (!anArchivePair.GetPairFromStore(0)) {
@@ -577,12 +665,13 @@ public class SSController {
 
         printSysOut("RestorePairsList ");
         setStatus("Pairs restored");
-        }
+    }
 
-    //
-    // store the gui to the defaults file
-    //
-    private void SavePairsList()
+    /*
+      store the gui to the defaults file
+      Keep this code for testing.
+    */
+    private void SavePairsListForTesting()
     {
        /*
         use Preferences class
@@ -633,5 +722,14 @@ public class SSController {
             Update the pairs list in the ListView
          */
         lvScreenShotPairs.setItems( listPairs );
+    }
+
+    /*
+      Unless we are logging, don't show make test pairs
+     */
+    public void OnTestLogOnly(ActionEvent actionEvent) {
+
+        btnMakeTestPairs.setVisible( chkTestLogOnly.isSelected() );
+
     }
 }
