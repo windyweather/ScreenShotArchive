@@ -204,8 +204,8 @@ public class SSController {
          */
         //spScrollPane = new ScrollPane(imgImageView);
         spImagePane.setPannable(true);
-        spImagePane.setHvalue(0.5);
-        spImagePane.setVvalue(0.5);
+        //spImagePane.setHvalue(0.5);
+        //spImagePane.setVvalue(0.5);
 
         /*
             Scrollbar shows us where we are in the list
@@ -278,8 +278,8 @@ public class SSController {
                             What happens if we don't restore x and y?
                          */
 
-                        spImagePane.setHvalue(x);
-                        spImagePane.setVvalue(y);
+                        //spImagePane.setHvalue(x);
+                        //spImagePane.setVvalue(y);
 
                     }
                 } );
