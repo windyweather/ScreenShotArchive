@@ -66,11 +66,9 @@ public class SSApplication extends Application {
         printSysOut(String.format("App Start: Restore Window Pos/Size  [%.0f,%.0f] / [%.0f,%.0f]", x,y, width, height) );
 
         /*
-          Wake up the controller to restore the pairs
+            The controller best knows how to get started
          */
-        printSysOut("SSApplication:start - calling SSController:RestorePairsList");
-        ssCtrl.RestorePairsList();
-        printSysOut("SSApplication:start - back from SSController:RestorePairsList");
+        ssCtrl.SetUpStuff();
 
         // When the stage closes store the current size and window location.
         /*

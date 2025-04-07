@@ -5,7 +5,7 @@ import javafx.stage.Window;
 import java.util.prefs.Preferences;
 
 import static net.windyweather.screenshotarchive.SSController.printSysOut;
-import static sun.util.locale.LocaleUtils.isEmpty;
+//import static sun.util.locale.LocaleUtils.isEmpty;
 
 
 public class SSArchivePair {

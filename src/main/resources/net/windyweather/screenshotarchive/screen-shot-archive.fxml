@@ -58,21 +58,21 @@
                 </HBox>
                 <ScrollPane fx:id="spImagePane" pannable="true" VBox.vgrow="ALWAYS">
                     <content>
-                        <Pane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <ImageView pickOnBounds="true" preserveRatio="true" />
-                            </children>
-                        </Pane>
+                        <ImageView fx:id="imgImageView" focusTraversable="true" onMouseClicked="#ImgOnMouseClicked" onMouseDragged="#ImgOnMouseDragged" pickOnBounds="true" preserveRatio="true" />
                     </content>
                 </ScrollPane>
                 <HBox fillHeight="false">
                     <children>
                         <Button fx:id="btnGoImagesStart" mnemonicParsing="false" onAction="#onGoImagesStart" text="|&lt;" />
-                        <ScrollBar fx:id="sbSlideToImage" maxWidth="2000.0" prefHeight="26.0" HBox.hgrow="ALWAYS">
-                            <padding>
-                                <Insets left="5.0" right="5.0" />
-                            </padding>
+                        <Button fx:id="btnGoImageBack10" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onGoImageBack10" text="&lt; 10" />
+                        <Button fx:id="btnGoImageBackOne" layoutX="37.0" layoutY="10.0" mnemonicParsing="false" onAction="#onGoImageBackOne" text="&lt; 1" />
+                        <ScrollBar fx:id="sbImageListScrollBar" disable="true" HBox.hgrow="ALWAYS">
+                            <HBox.margin>
+                                <Insets top="5.0" />
+                            </HBox.margin>
                         </ScrollBar>
+                        <Button fx:id="btnImageForwardOne" layoutX="78.0" layoutY="10.0" mnemonicParsing="false" onAction="#onGoImageForwardOne" text="1 &gt;" />
+                        <Button fx:id="btnImageForward10" mnemonicParsing="false" onAction="#onGoImageForward10" text="10 &gt;" />
                         <Button fx:id="btnGoImagesEnd" mnemonicParsing="false" onAction="#onGoImagesEnd" text="&gt;|">
                             <HBox.margin>
                                 <Insets />
