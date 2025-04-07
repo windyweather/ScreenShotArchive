@@ -548,13 +548,16 @@ public class SSController {
 
     /*
         Get and put stuff from / to the GUI with our local pair
+        Always make a new pair here in case we are going to add a pair
      */
     private boolean GetPairFromGui() {
 
-        anArchivePair.sPairName = txtSelectedPairName.getText();
-        if (anArchivePair.sPairName.isEmpty()) {
+        String sPairName = txtSelectedPairName.getText();
+        if ( sPairName.isEmpty()) {
             return false;
         }
+        anArchivePair = new SSArchivePair();
+        anArchivePair.sPairName = sPairName;
         anArchivePair.sSourcePath = txtSourcePath.getText();
         anArchivePair.sDestinationPath = txtDestPath.getText();
         anArchivePair.sFolderSuffix = cbChooseFolderSuffix.getValue();
@@ -629,25 +632,30 @@ public class SSController {
             setStatus("Enter a path name first");
             return;
         }
+        printSysOut("GetPairFromGui called");
+
+        if ( true ) { // did getPairFromGUI mess up the list?
         /*
             Add an item to the end of the listPairs.
             We don't check for duplicate names.
             Then select and focus on the item we just
             added at the end of the list
          */
-        printSysOut(("btnAddPair - Add a pair from GUI at the end of list"));
-        PrintAPair( "anArchivePair", anArchivePair);
-        SSArchivePair aPair = MakePairForList();
-        PrintAPair( "aPair", aPair );
-        listPairs.addLast( aPair );
+            printSysOut(("btnAddPair - Add a pair from GUI at the end of list"));
+            PrintAPair("anArchivePair", anArchivePair);
+            SSArchivePair aPair = MakePairForList();
+            PrintAPair("aPair", aPair);
+            listPairs.addLast(aPair);
         /*
             Gotta tell the ListView about the list again or once?
             Anyway, apparently every time.
          */
-        lvScreenShotPairs.setItems( listPairs );
-        int idx = listPairs.size();
-        SelectAndFocusIndex( idx+1);
-        setStatus("Pair added to list");
+            lvScreenShotPairs.setItems(listPairs);
+            int idx = listPairs.size() - 1;
+            intImageIndex = idx;
+            SelectAndFocusIndex(idx);
+            setStatus("Pair added to list at end");
+        }
     }
 
     /*
@@ -703,7 +711,11 @@ public class SSController {
          */
         printSysOut(("btnUpdatePair - Update a selected pair in the list from the GUI"));
         PrintAPair( "anArchivePair", anArchivePair);
-        SSArchivePair aPair = MakePairForList();
+        /*
+            GetPairFromGui actually made a new pair to avoid
+            clobbering the old one, so we can use that one.
+         */
+        SSArchivePair aPair = anArchivePair; //MakePairForList();
         PrintAPair( "aPair", aPair );
         listPairs.remove(idx);
         listPairs.add( idx, aPair );

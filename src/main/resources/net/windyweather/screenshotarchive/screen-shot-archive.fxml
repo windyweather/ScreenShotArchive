@@ -1,26 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollBar?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<SplitPane fx:id="splitPaneOutsideContainer" dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="740.0" prefWidth="861.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.SSController">
+<SplitPane fx:id="splitPaneOutsideContainer" dividerPositions="0.35257452574525744" orientation="VERTICAL" prefHeight="740.0" prefWidth="861.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.SSController">
     <items>
         <VBox prefHeight="301.0" prefWidth="854.0">
             <children>
@@ -118,7 +104,7 @@
                                             </padding>
                                         </Label>
                                         <TextField fx:id="txtSelectedPairName" />
-                                        <CheckBox fx:id="chkSearchSubFolders" mnemonicParsing="false" text="Search Sub-Folders">
+                                        <CheckBox fx:id="chkSearchSubFolders" mnemonicParsing="false" text="Search Sub-Folders in Source">
                                             <padding>
                                                 <Insets left="30.0" />
                                             </padding>
@@ -181,7 +167,7 @@
                                             </padding>
                                         </Label>
                                         <TextField fx:id="txtFilePrefix" />
-                                        <CheckBox fx:id="chkPreserveFileNames" mnemonicParsing="false" text="Preserve File Names">
+                                        <CheckBox fx:id="chkPreserveFileNames" mnemonicParsing="false" text="Preserve File Names on Copy to Destination">
                                             <padding>
                                                 <Insets left="10.0" />
                                             </padding>
@@ -207,15 +193,15 @@
                                 </HBox>
                         <HBox alignment="TOP_RIGHT" prefHeight="60.0" prefWidth="200.0">
                            <children>
+                              <Button fx:id="btnMakeTestPairs" mnemonicParsing="false" onAction="#OnMakeTestPairs" text="Make Test Pairs">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin></Button>
                                         <CheckBox fx:id="chkTestLogOnly" mnemonicParsing="false" onAction="#OnTestLogOnly" text="Test - Log Only">
                                             <padding>
                                                 <Insets left="10.0" top="5.0" />
                                             </padding>
                                         </CheckBox>
-                              <Button fx:id="btnMakeTestPairs" mnemonicParsing="false" onAction="#OnMakeTestPairs" text="Make Test Pairs">
-                                 <HBox.margin>
-                                    <Insets left="20.0" />
-                                 </HBox.margin></Button>
                            </children>
                         </HBox>
                                 <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
