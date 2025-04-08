@@ -20,11 +20,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.io.File;
+import java.io.*;
 import java.util.prefs.Preferences;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 import static javafx.stage.WindowEvent.*;
 import static net.windyweather.screenshotarchive.SSApplication.NODE_NAME;
@@ -729,7 +726,35 @@ public class SSController {
     }
 
 
-    public void OnCopySource(ActionEvent actionEvent) {
+    /*
+        Copy Images in the Source Path, to the Destination Path with the options
+     */
+    public void OnCopySource(ActionEvent actionEvent) throws IOException {
+
+
+        /*
+        public static String  FileHelperCopySource( String sSourcePath, String sDestinationPath,
+                                               String sFolderPrefix, String sFilePrefix,
+                                                boolean bPreserveFileNames, boolean bSourceSubFolders )
+         */
+        String sSourcePath = txtSourcePath.getText();
+        String sDestinationPath = txtDestPath.getText();
+        String sFolderPrefix = cbChooseFolderSuffix.getValue();
+        String sFilePrefix = txtFilePrefix.getText();
+        boolean bPreserveFileNames = chkPreserveFileNames.isSelected();
+        boolean bSearchSubFolders = chkSearchSubFolders.isSelected();
+
+        if ( sSourcePath.isBlank() || sDestinationPath.isBlank() ) {
+            setStatus("Set Source and Destination Paths to Copy Source Images");
+            return;
+        }
+        String sCopyStatus;
+
+        sCopyStatus = SSAFilesHelper.FileHelperCopySource( sSourcePath, sDestinationPath,
+                sFolderPrefix, sFilePrefix, bPreserveFileNames, bSearchSubFolders );
+
+        setStatus( sCopyStatus );
+
     }
 
     public void OnDeleteSource(ActionEvent actionEvent) {
