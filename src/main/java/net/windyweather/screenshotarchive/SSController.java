@@ -6,6 +6,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,10 +21,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.*;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import static javafx.stage.WindowEvent.*;
@@ -399,7 +405,41 @@ public class SSController {
         CloseAppAndStage();
     }
 
-    public void onAboutApplication(ActionEvent actionEvent) {
+    /*
+        Launch the about dialog, and wait until the user closes it
+     */
+    public void onAboutApplication(ActionEvent actionEvent) throws IOException {
+        printSysOut("onAboutApplication - launch about dialog");
+
+        Stage stageOfUs = (Stage) txtSelectedPairName.getScene().getWindow();
+        Stage stage = new Stage();
+
+        FXMLLoader fxmlloader = new FXMLLoader( AboutDialog.class.getResource("about-dialog.fxml"));
+        Scene aboutScene = new Scene( fxmlloader.load() );
+        AboutDialog aboutControl = (AboutDialog) fxmlloader.getController();
+
+        Parent root = FXMLLoader.load(
+                Objects.requireNonNull(AboutDialog.class.getResource("about-dialog.fxml")));
+        stage.setScene(new Scene(root));
+        stage.setTitle("About Screen Shot Archive");
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner( stageOfUs );
+
+        // get the controller so we can call it with window events
+        //ssCtrl = (SSController) fxmlLoader.getController();
+        stage.addEventHandler( WindowEvent.ANY, new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                aboutControl.handleWindowEvent(event);
+            }
+        });
+
+
+        printSysOut("onAbout - show about dialog");
+        stage.show();
+        // get the controller so we can call it with window events
+        //aboutControl.SetStuffUp();
+
     }
 
 
