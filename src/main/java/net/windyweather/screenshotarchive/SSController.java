@@ -303,12 +303,10 @@ public class SSController {
             btnViewSource.setDisable( true );
             btnDeleteSource.setDisable( true );
             btnCopySource.setDisable( true );
-            return;
         }
         if ( bDestinationBlank ) {
             btnViewDestination.setDisable( true );
             btnCopySource.setDisable( true );
-            return;
         }
         /*
             Check to see if we have valid paths and set the buttons accordingly
@@ -1144,12 +1142,27 @@ public class SSController {
 
 
     /*
-    Use apache DirectoryScanner to get a list of images in the specified folder
+    Use DirectoryScanner to get a list of images in the specified folder
     with or without the File Prefix. Source does not use prefix, destination does
+    Destination also uses the FolderSuffix based on today's date
  */
-    private String[] GetImagesInFolder( String sFolder, boolean bUsePfx, boolean bUseSubFolders ){
-
+    private String[] GetImagesInFolder( String sFolder, boolean bUsePfx,
+                                        boolean bUseFolderSuffix, boolean bUseSubFolders ){
         long intStartOpen = System.currentTimeMillis();
+        /*
+            If we are using the folder suffix, then it's based on today's date
+            if it's blank, use nothing, if not, then pass it to the filehelper class
+            to get a suffix string for the folder
+         */
+        String sFolderSuffix = "";
+        if ( bUseFolderSuffix ) {
+            String sFolderSuffixCode = cbChooseFolderSuffix.getValue();
+            if ( !sFolderSuffixCode.isBlank() ) {
+                sFolderSuffix = SSAFilesHelper.GetTodayFolderSuffix( sFolderSuffixCode );
+            }
+        }
+
+
         /*
             we care about only three image types: *.bmp, *.jpg, *.png
             for Destination, we use the File Prefix. For source, get all images.
@@ -1175,16 +1188,21 @@ public class SSController {
             the images. Only the file names are saved in the
             scanner result list.
          */
-        sImageBasePath = sFolder;
+        sImageBasePath = sFolder+File.separator+sFolderSuffix;
         String[] saIncludeImages = new String[]{sSubPfx+sFPfx + "*.bmp",sFPfx + sSubPfx+ "*.jpg", sSubPfx+sFPfx+"*.png"  };
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setIncludes( saIncludeImages );
         scanner.setCaseSensitive( false );
-        scanner.setBasedir( new File( sFolder ));
-        scanner.scan();
+        scanner.setBasedir( new File( sImageBasePath ));
+        String[] files = new String[0];
+        try {
+            scanner.scan();
+            files = scanner.getIncludedFiles();
+        } catch ( IllegalStateException exc ) {
+            printSysOut(String.format("GetImagesInFolder - scan failed for : %s", sImageBasePath) );
+        }
 
-        String[] files = scanner.getIncludedFiles();
         int iHowMany = files.length;
 
         /*
@@ -1194,7 +1212,7 @@ public class SSController {
         sbImageListScrollBar.setMax( iHowMany-1 );
         sbImageListScrollBar.setMin( 0 );
 
-        printSysOut(String.format("GetImagesInFolder found %d files in %s", iHowMany, sFolder));
+        printSysOut(String.format("GetImagesInFolder found %d files in %s", iHowMany, sImageBasePath));
         long intEndOpen = System.currentTimeMillis();
         printSysOut(String.format("GetImagesInFolder %d ms", intEndOpen - intStartOpen));
         return files;
@@ -1206,7 +1224,7 @@ public class SSController {
      */
     public void OnViewSource(ActionEvent actionEvent) {
 
-        String[] sImageFileNames = GetImagesInFolder(txtSourcePath.getText(), false, true);
+        String[] sImageFileNames = GetImagesInFolder(txtSourcePath.getText(), false, false, true);
 
         if (sImageFileNames.length > 0) {
             bImagesValid = true;
@@ -1217,9 +1235,12 @@ public class SSController {
         setStatus(String.format("Source Images Found: %d", sImageFileNames.length));
     }
 
+    /*
+        Based on the folderSuffix, search today's destination folder
+     */
     public void OnViewDestination(ActionEvent actionEvent) {
 
-        String[] sImageFileNames = GetImagesInFolder( txtDestPath.getText(), true , false);
+        String[] sImageFileNames = GetImagesInFolder( txtDestPath.getText(), true , true, false);
 
         if (sImageFileNames.length > 0) {
             bImagesValid = true;

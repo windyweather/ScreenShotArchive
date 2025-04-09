@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -26,6 +27,8 @@ public class SSAFilesHelper {
         Return the modified date/time of the file as a folder prefix string
         so we put the files in subfolders according to date, or not.
         If the folder prefix is blank, just dump all the files in the folder provided.
+        Yes, the code in the program and the code for the library happen to be the same
+        but if they change in the future this will make it easier to fix.
      */
     private static String GetDateFolderPrefix (FileTime ftModified, String sFolderPrefix ) {
         String sDateFolderPrefix = "";
@@ -51,6 +54,23 @@ public class SSAFilesHelper {
         }
         return sDateFolderPrefix;
     }
+
+    /*
+        Get the folder suffix of today by using a FileTime of now
+        This is called by ViewDestination to show this months or today's images from the destination
+     */
+    public static String GetTodayFolderSuffix( String sFolderSfxCode ) {
+
+        String sFolderSfxToday;
+        //java.time.LocalDate today = java.time.LocalDate.now();
+        Instant today = Instant.now();
+        FileTime ftToday = FileTime.from(today);
+        sFolderSfxToday = GetDateFolderPrefix( ftToday, sFolderSfxCode );
+        SSController.printSysOut(String.format("GetDayFolderSuffix of Today %s", sFolderSfxToday));
+
+        return sFolderSfxToday;
+    }
+
 
     /*
         Copy a file from Source to Destination without modifying the file name
