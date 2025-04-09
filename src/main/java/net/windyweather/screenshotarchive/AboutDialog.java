@@ -2,6 +2,7 @@ package net.windyweather.screenshotarchive;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -46,10 +47,15 @@ public class AboutDialog {
             taAboutText.appendText(s);
         }
         taAboutText.setEditable( false );
-        /*
-            See if we can modify the version label
-         */
-        lblSSAVersion.setText("Nothing to see here");
+
+    }
+
+    /*
+        During Initialize, fix up the text area.
+     */
+    @FXML
+    void initialize(){
+        SetStuffUp();
     }
 
     public void OnCloseAbout(ActionEvent actionEvent) {
@@ -69,10 +75,19 @@ public class AboutDialog {
             System.out.println("About Window shown");
             /*
                 We have to wait until here to rewrite the TextArea with the
-                content with new lines in it.
+                content with new lines in it. DOESN'T WORK
              */
             SetStuffUp();
         }
+        if (state == WINDOW_SHOWING) {
+            System.out.println("About Window showing");
+            /*
+                We have to wait until here to rewrite the TextArea with the
+                content with new lines in it. DOESN'T WORK
+             */
+            SetStuffUp();
+        }
+
         else if (state == WINDOW_HIDING) {
             System.out.println("About Window hiding");
         }
