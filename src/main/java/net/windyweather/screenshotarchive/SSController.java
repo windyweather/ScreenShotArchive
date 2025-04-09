@@ -259,11 +259,15 @@ public class SSController {
                         setStatus(String.format("Zoom %.3f", dZoomScale));
 
                         /*
+                            We saved this above, don't mess with it again
+                         */
+                        if ( false ) {
+                        /*
                             Lets try this here and see if that fixes the pan after zoom
                          */
-                        x = spImagePane.getHvalue();
-                        y = spImagePane.getVvalue();
-
+                            x = spImagePane.getHvalue();
+                            y = spImagePane.getVvalue();
+                        }
                         /*
                          ********************************************************************
                          *************** The following statement appears to have made it work
@@ -272,11 +276,10 @@ public class SSController {
                          */
                         imgImageView.setFitWidth(anImage.getWidth() * dZoomScale);
                         /*
-                            What happens if we don't restore x and y?
+                            Restore these for best behaviour of position in window after zoom
                          */
-
-                        //spImagePane.setHvalue(x);
-                        //spImagePane.setVvalue(y);
+                        spImagePane.setHvalue(x);
+                        spImagePane.setVvalue(y);
 
                     }
                 } );
