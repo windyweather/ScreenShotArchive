@@ -342,12 +342,21 @@ public class SSController {
         printSysOut("SetUpStuff - back from RestorePairsList");
 
         /*
-        set some paths for testing
+            If we have pairs, load up the first one in the GUI
          */
-        String sTestImagePath = "D:\\MMO_Pictures\\AlienBlackout";
+        //printSysOut("SetUpStuff - if we have pairs, load up the first one");
 
-        txtSourcePath.setText(sTestImagePath);
-        txtDestPath.setText(sTestImagePath);
+
+        /*
+        set some paths for testing
+        obsolete now that we are saving / restoring pairs
+         */
+        if ( false ) {
+            String sTestImagePath = "D:\\MMO_Pictures\\AlienBlackout";
+
+            txtSourcePath.setText(sTestImagePath);
+            txtDestPath.setText(sTestImagePath);
+        }
 
         intImageIndex = 0;
         bImagesValid = false;
@@ -613,7 +622,7 @@ public class SSController {
         pair.sFolderSuffix = anArchivePair.sFolderSuffix;
         pair.sFilePrefix = anArchivePair.sFilePrefix;
         pair.bSearchSubFolders = anArchivePair.bSearchSubFolders;
-        pair.bPreserveFileNames = anArchivePair.bSearchSubFolders;
+        pair.bPreserveFileNames = anArchivePair.bPreserveFileNames;
         // return the manually copied pair
         return pair;
     }
@@ -935,6 +944,8 @@ public class SSController {
         int numFound = listPairs.size();
         if (numFound != 0) {
             SelectAndFocusIndex( 0);
+            anArchivePair = listPairs.get( 0 );
+            PutGuiFromPair();
             setStatus(String.format("%d pairs restored", numFound));
         } else {
             setStatus("No pairs found to restore");

@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
@@ -28,14 +30,24 @@ public class SSAFilesHelper {
     private static String GetDateFolderPrefix (FileTime ftModified, String sFolderPrefix ) {
         String sDateFolderPrefix = "";
         String sDateFormat = "";
-        if (Objects.equals(sFolderPrefix, "yyyy_mm")) {
-            sDateFormat = "yyyy_mm";
-        } else if ( Objects.equals( sFolderPrefix, "yyyy_mm_dd") ) {
-            sDateFormat = "yyyy_mm_dd";
+        if (Objects.equals(sFolderPrefix, "yyyy_MM")) {
+            sDateFormat = "yyyy_MM";
+        } else if ( Objects.equals( sFolderPrefix, "yyyy_MM_dd") ) {
+            sDateFormat = "yyyy_MM_dd";
         }
         if ( !sDateFormat.isBlank() ) {
-            DateFormat df = new SimpleDateFormat(sDateFormat);
+
+            FileTime fileTime = ftModified;
+            ZonedDateTime zonedDateTime = ZonedDateTime.parse(fileTime.toString());
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern(sDateFormat);
+            sDateFolderPrefix = dtf.format(zonedDateTime);
+            //SSController.printSysOut( String.format("GetDateFolderPrefix - %s", sDateFolderPrefix ) );
+
+            /*
+            SimpleDateFormat df = new SimpleDateFormat(sDateFormat);
             sDateFolderPrefix = df.format( ftModified );
+            */
+
         }
         return sDateFolderPrefix;
     }
