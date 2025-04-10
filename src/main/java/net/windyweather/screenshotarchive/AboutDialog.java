@@ -10,6 +10,9 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.awt.*;
+import java.io.IOException;
+
 import static java.awt.event.WindowEvent.WINDOW_ACTIVATED;
 import static javafx.stage.WindowEvent.*;
 
@@ -47,7 +50,8 @@ public class AboutDialog {
             taAboutText.appendText(s);
         }
         taAboutText.setEditable( false );
-
+        taAboutText.deselect();
+        taAboutText.home();
     }
 
     /*
@@ -96,4 +100,13 @@ public class AboutDialog {
         }
     }
 
+    /*
+        We have to do the link ourselves
+     */
+    public void OnLinkToGitHub(ActionEvent actionEvent) throws IOException {
+        String uri = hlLinkToGitHub.getText();
+        System.out.println(String.format("Open GitHub link in the browser: %s", uri));
+        Desktop desktop = Desktop.getDesktop();
+        desktop.browse( java.net.URI.create(uri));
+    }
 }

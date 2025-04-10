@@ -423,6 +423,7 @@ public class SSController {
         stage.setScene(new Scene(root));
         stage.setTitle("About Screen Shot Archive");
         stage.initModality(Modality.WINDOW_MODAL);
+        stage.setResizable(false);
         stage.initOwner( stageOfUs );
 
         // get the controller so we can call it with window events

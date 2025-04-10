@@ -28,7 +28,7 @@
             </padding>
                   </Label>
          <TextArea fx:id="taAboutText" editable="false" minWidth="500.0" prefWidth="200.0" text="Screen Shot Archive is a program to manage, view and backup screenshots from all the games you play.The model is that each game stores screen shots in folders in various places, including in various subfolders of your home folder:C:\Users\Yournamehere\OneDrive\Documents\game\screens or inSomeSSD:\GameCompany\GameFolder\ScreenShots.So with these game folders all over the place how to do you conveniently:1 - View the files.2 - Backup the files to a common place.3 - Organize them so you can easily find them by date over the years that you play.4 - Rename the files so you can find the files by game name. Renaming is optional.See more at the link below:" wrapText="true" />
-         <Hyperlink fx:id="hlLinkToGitHub" text="https://github.com/windyweather/ScreenShotArchive">
+         <Hyperlink fx:id="hlLinkToGitHub" onAction="#OnLinkToGitHub" text="https://github.com/windyweather/ScreenShotArchive">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
