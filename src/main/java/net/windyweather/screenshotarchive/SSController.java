@@ -330,7 +330,12 @@ public class SSController {
     } // EnableFunctionButtons
 
     @FXML
-
+    /*
+        Called to initialize the controller
+     */
+    void initialize(){
+        SetUpStuff();
+    }
     /*
         Called from App to set things up
      */

@@ -67,8 +67,10 @@ public class SSApplication extends Application {
 
         /*
             The controller best knows how to get started
+            OBSOLETE: the right way to do this is the initialize method in the
+            controller.
          */
-        ssCtrl.SetUpStuff();
+        //ssCtrl.SetUpStuff();
 
         // When the stage closes store the current size and window location.
         /*

@@ -81,7 +81,7 @@ public class AboutDialog {
                 We have to wait until here to rewrite the TextArea with the
                 content with new lines in it. DOESN'T WORK
              */
-            SetStuffUp();
+            //SetStuffUp();
         }
         if (state == WINDOW_SHOWING) {
             System.out.println("About Window showing");
@@ -89,7 +89,7 @@ public class AboutDialog {
                 We have to wait until here to rewrite the TextArea with the
                 content with new lines in it. DOESN'T WORK
              */
-            SetStuffUp();
+            //SetStuffUp();
         }
 
         else if (state == WINDOW_HIDING) {
