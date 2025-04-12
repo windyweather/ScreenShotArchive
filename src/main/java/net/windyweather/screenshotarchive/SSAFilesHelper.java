@@ -293,13 +293,59 @@ public class SSAFilesHelper {
     /*
         All image files [BMP, PNG, JPG] are deleted from the path. Subfolders are not disturbed.
      */
-    public static boolean FileHelperDeleteFiles( String sFilePath ) {
+    private static boolean FileHelperDeleteFiles( String sFilePath ) {
         return true;
     };
 
-    public static boolean FileHelperCleanSource( String sFilePath, boolean bSubFolders ) {
+    /*
+        Delete image files from the supplied folder - presumably the Game Screenshot folder -
+        and return a status string for display by the app to tell the user what happened.
+     */
 
-        return true;
+    public static String FileHelperCleanSource( String sSourcePath, boolean bSourceSubFolders ) {
+
+        /*
+            Set things up to search for subfolders if we should
+            Should only be used for Source since some games store images
+            in subfolders, oddly.
+         */
+        String sSubPfx = "";
+        if (bSourceSubFolders) {
+            sSubPfx = "**\\";
+        }
+        String[] saIncludeImages = new String[]{sSubPfx + "*.bmp", sSubPfx + "*.jpg", sSubPfx + "*.png"};
+
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setIncludes(saIncludeImages);
+        scanner.setCaseSensitive(false);
+        scanner.setBasedir(new File(sSourcePath));
+        scanner.scan();
+
+        /*
+            Get a list of the source files we found
+         */
+        String[] sSourceFiles = scanner.getIncludedFiles();
+
+        int iManyDeleted = 0;
+
+        for (String sSourceFile : sSourceFiles) {
+            String sSourceAbsFilePath = sSourcePath + File.separator + sSourceFile;
+            /*
+                Delete the file from Source Game Screen Shot folder
+             */
+            try {
+                File fSourceFile = new File(sSourceAbsFilePath);
+                if (fSourceFile.delete()) {
+                    iManyDeleted++;
+                }
+
+            } catch (Exception e) {
+                //throw new RuntimeException(e);
+                return String.format("Error deleting source file: %s", sSourceAbsFilePath);
+            }
+
+        }
+
+        return String.format("%d Source Images Deleted", iManyDeleted );
     }
-
 }

@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import static javafx.stage.WindowEvent.*;
+import static net.windyweather.screenshotarchive.SSAFilesHelper.FileHelperCleanSource;
 import static net.windyweather.screenshotarchive.SSApplication.NODE_NAME;
 import static net.windyweather.screenshotarchive.SSApplication.WINDOW_POSITION_X;
 import static net.windyweather.screenshotarchive.SSApplication.WINDOW_POSITION_Y;
@@ -813,7 +814,21 @@ public class SSController {
 
     }
 
+    /*
+        Call the File Helper to Delete source images from the
+        game folder
+     */
     public void OnDeleteSource(ActionEvent actionEvent) {
+        String sSourcePath = txtSourcePath.getText();
+        boolean bSearchSubFolders = chkSearchSubFolders.isSelected();
+
+        /*
+            Depend on the Enable/Disable of the buttons to not send
+            us here if we don't belong. LOL
+         */
+        String sts = FileHelperCleanSource(  sSourcePath, bSearchSubFolders );
+        setStatus( sts );
+
     }
 
     private void CloseAppAndStage() {
@@ -940,22 +955,6 @@ public class SSController {
 
 
 
-    /*
-    // use the java System.Properties class for ini files
-    // and write them in XML format.
-    // Both the default file and the show files are stored in this way.
-    */
-/*
-    private String propertyFilePathPrefix()
-    {
-        return System.getProperty("user.home")+ File.separator+".windyweather";
-    }
-
-    private String defaultsFilePath()
-    {
-        return propertyFilePathPrefix() + File.separator+"ScreenShotArchiveDefaults.xml";
-    }
-*/
 
     //
     // Restore the Pair List File from Preferences
