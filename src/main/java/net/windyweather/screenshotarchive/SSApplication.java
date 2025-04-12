@@ -27,7 +27,7 @@ public class SSApplication extends Application {
     public static final String NODE_NAME = "ScreenShotArchive";
     //private static final String BUNDLE = "Bundle";
 
-    SSController ssCtrl;
+
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -36,7 +36,11 @@ public class SSApplication extends Application {
         stage.setTitle("Screen Shot Archive");
         stage.setScene(scene);
 
-        // get the controller so we can call it with window events
+        /*
+            get the controller so we can call it with window events
+            This is needed when the app is closed with the X at the top right of the window
+         */
+        SSController ssCtrl;
         ssCtrl = (SSController) fxmlLoader.getController();
         stage.addEventHandler( WindowEvent.ANY, new EventHandler<WindowEvent>() {
             @Override
@@ -65,30 +69,13 @@ public class SSApplication extends Application {
 
         printSysOut(String.format("App Start: Restore Window Pos/Size  [%.0f,%.0f] / [%.0f,%.0f]", x,y, width, height) );
 
-        /*
-            The controller best knows how to get started
-            OBSOLETE: the right way to do this is the initialize method in the
-            controller.
-         */
-        //ssCtrl.SetUpStuff();
-
-        // When the stage closes store the current size and window location.
-        /*
-            the only problem with this is that when a button or menu item is used to close the app, no
-            window event occurs. But this does catch the X at the top of the window, which those do not.
-         */
-        stage.setOnCloseRequest((final WindowEvent event) -> {
-
-            printSysOut("stage.setOnCloseRequest: Save Window Pos/Size");
-            Preferences preferences = Preferences.userRoot().node(NODE_NAME);
-            preferences.putDouble(WINDOW_POSITION_X, stage.getX());
-            preferences.putDouble(WINDOW_POSITION_Y, stage.getY());
-            preferences.putDouble(WINDOW_WIDTH, stage.getWidth());
-            preferences.putDouble(WINDOW_HEIGHT, stage.getHeight());
-        });
     }
 
-
+    /*
+        Great minds differ over whether this is called by the platform when a JAR is built.
+        Apparently another class is required that is not JavaFx to actually start the
+        program. Go see the class called JarMain for that class.
+     */
     public static void main(String[] args) {
         Application.launch();
     }

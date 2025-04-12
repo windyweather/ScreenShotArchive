@@ -6,6 +6,7 @@ module net.windyweather.screenshotarchive {
     requires java.desktop;
     requires java.prefs;
     requires plexus.utils;
+    requires commons.io;
 
     opens net.windyweather.screenshotarchive to javafx.fxml;
     exports net.windyweather.screenshotarchive;

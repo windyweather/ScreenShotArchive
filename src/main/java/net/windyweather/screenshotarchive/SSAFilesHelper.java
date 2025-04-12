@@ -15,6 +15,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import org.apache.commons.io.FilenameUtils;
+
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 
 /*
@@ -149,6 +151,7 @@ public class SSAFilesHelper {
             return false;
         }
         Path aFilePath = Paths.get(sSourceAbsFilePath);
+        String sSourceExtension = FilenameUtils.getExtension(sSourceAbsFilePath);
         FileTime ftModified = Files.getLastModifiedTime(aFilePath);
         /*
             Get a subfolder based on the folder prefix and the modified date of the source file.
@@ -174,7 +177,11 @@ public class SSAFilesHelper {
          */
         String sFileDateSuffix = GetDateFolderPrefix( ftModified, "yyyy_MM_dd_HH_mm_ss_SSS" );
         //String sFileName = String.valueOf(aFilePath.getFileName());
-        String sFileDateName = sFilePrefix + sFileDateSuffix;
+        /*
+            Add the file type [Extension] from the source file. Don't call some class to figure it out
+            from the content of the file. Assume the source file knows what type it is.
+         */
+        String sFileDateName = sFilePrefix + sFileDateSuffix + "." + sSourceExtension;
         Path pDestinationFile = Paths.get(sDestAbsFilePathDir + File.separator + sFileDateName);
 
 
@@ -195,7 +202,10 @@ public class SSAFilesHelper {
          */
         // Try / Catch around the actual copy?
         try {
-            //Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
+            /*
+                Actually copy the file. Maybe put a check for testing around this.
+             */
+            Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
             SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Copy %s >> %s",
                     aFilePath.toString(), pDestinationFile.toString()  ));
         } catch (Exception e) {
