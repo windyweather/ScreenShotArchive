@@ -928,14 +928,14 @@ public class SSController {
     public void handleWindowEvent(WindowEvent event) {
         EventType<WindowEvent> state = event.getEventType();
         if (state == WINDOW_SHOWN) {
-            System.out.println("Window shown");
+            printSysOut("Window shown");
             OnWindowShown(event);
         }
         else if (state == WINDOW_HIDING) {
-            System.out.println("Window hiding");
+            printSysOut("Window hiding");
         }
         else if ( state == WINDOW_CLOSE_REQUEST) {
-            System.out.println("Window close request");
+            printSysOut("Window close request");
             OnWindowCloseRequest(event);
             }
         }
@@ -943,7 +943,7 @@ public class SSController {
 
     // Just a dummy action to cause txtStatus to be declared.
     public void OnKeyPressedStatus(KeyEvent keyEvent) {
-        System.out.println("OnKeyPressedStatus");
+        printSysOut("OnKeyPressedStatus");
     }
 
     /*
