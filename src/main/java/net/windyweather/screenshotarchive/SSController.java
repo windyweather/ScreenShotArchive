@@ -1169,14 +1169,18 @@ public class SSController {
     }
     public void OnMakeTestPairs(ActionEvent actionEvent) {
 
-        printSysOut("OnMakeTestPairs - make some test pairs");
-        for ( int i=0; i<10; i++) {
-            listPairs.add( FillTestPair() );
-        }
+        if (false) {
+            printSysOut("OnMakeTestPairs - make some test pairs");
+            for (int i = 0; i < 10; i++) {
+                listPairs.add(FillTestPair());
+            }
         /*
             Update the pairs list in the ListView
          */
-        lvScreenShotPairs.setItems( listPairs );
+            lvScreenShotPairs.setItems(listPairs);
+        }
+
+        //sbImageListScrollBar.setDisable( !sbImageListScrollBar.isDisable() );
     }
 
     /*

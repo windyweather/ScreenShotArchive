@@ -52,7 +52,7 @@
                         <Button fx:id="btnGoImagesStart" mnemonicParsing="false" onAction="#onGoImagesStart" text="|&lt;" />
                         <Button fx:id="btnGoImageBack10" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onGoImageBack10" text="&lt; 10" />
                         <Button fx:id="btnGoImageBackOne" layoutX="37.0" layoutY="10.0" mnemonicParsing="false" onAction="#onGoImageBackOne" text="&lt; 1" />
-                        <ScrollBar fx:id="sbImageListScrollBar" disable="true" HBox.hgrow="ALWAYS">
+                        <ScrollBar fx:id="sbImageListScrollBar" disable="true" stylesheets="@ssarchive.css" HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets top="5.0" />
                             </HBox.margin>
