@@ -29,6 +29,8 @@ public class SSAFilesHelper {
         If the folder prefix is blank, just dump all the files in the folder provided.
         Yes, the code in the program and the code for the library happen to be the same
         but if they change in the future this will make it easier to fix.
+        *** Also this method is used to create the "File Suffix" which is just the modified time
+        of the file formated as a string so that it is unique.
      */
     private static String GetDateFolderPrefix (FileTime ftModified, String sFolderPrefix ) {
         String sDateFolderPrefix = "";
@@ -37,6 +39,8 @@ public class SSAFilesHelper {
             sDateFormat = "yyyy_MM";
         } else if ( Objects.equals( sFolderPrefix, "yyyy_MM_dd") ) {
             sDateFormat = "yyyy_MM_dd";
+        } else if ( Objects.equals( sFolderPrefix, "yyyy_MM_dd_HH_mm_ss_SSS") ) {
+            sDateFormat = sFolderPrefix;
         }
         if ( !sDateFormat.isBlank() ) {
 
@@ -117,8 +121,14 @@ public class SSAFilesHelper {
         /*
             Actually Copy the file.
          */
-        // Try / Catch around the following?
-        // Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
+        // Try / Catch around the actual copy?
+        try {
+            //Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
+        } catch (Exception e) {
+            //throw new RuntimeException(e);
+            return false;
+        }
+
 
         return true;
     }
@@ -130,11 +140,73 @@ public class SSAFilesHelper {
         it again.
      */
     private static boolean CopyModifiedSourceToDestination(
-            String sSourceAbsFilePath, String sDestinationPath, String sFolderPrefix, String sFilePrefix ) {
+            String sSourceAbsFilePath, String sDestinationPath, String sFolderPrefix, String sFilePrefix ) throws IOException {
+
+        //Path pSrcFile = Paths.get(sSourceAbsFilePath);
+        File fSrcFile = new File(sSourceAbsFilePath);
+        if (!fSrcFile.exists()) {
+            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Source File Not Found %s", sSourceAbsFilePath));
+            return false;
+        }
+        Path aFilePath = Paths.get(sSourceAbsFilePath);
+        FileTime ftModified = Files.getLastModifiedTime(aFilePath);
         /*
-            Tie this off for now
+            Get a subfolder based on the folder prefix and the modified date of the source file.
          */
-        return false;
+        String sDateFolderPrefix = GetDateFolderPrefix(ftModified, sFolderPrefix);
+        String sDestAbsFilePathDir = sDestinationPath;
+        if (!sDateFolderPrefix.isBlank()) {
+            sDestAbsFilePathDir += File.separator + sDateFolderPrefix;
+        }
+        File fDestFile = new File(sDestAbsFilePathDir);
+        /*
+            If the destination sub-folder does not exist, then create it
+         */
+        if (!fDestFile.exists()) {
+            Path pDstFile = Paths.get(sDestAbsFilePathDir);
+            // Try / Catch around the following?
+            Path pDstPathDone = Files.createDirectory( pDstFile );
+        }
+        /*
+           Make a filename from the sFilePrefix [ things like ESO_ or GW2_ for
+           Elder Scroll Online or Guild Wars 2, and follow that by a string from the
+           file modified date/time in the format of: yyyy_MM_dd_HH_mm_ss_SSS
+         */
+        String sFileDateSuffix = GetDateFolderPrefix( ftModified, "yyyy_MM_dd_HH_mm_ss_SSS" );
+        //String sFileName = String.valueOf(aFilePath.getFileName());
+        String sFileDateName = sFilePrefix + sFileDateSuffix;
+        Path pDestinationFile = Paths.get(sDestAbsFilePathDir + File.separator + sFileDateName);
+
+
+        /*
+            If the destination file, in all its Date-ified Glory exists, that means that we
+            copied the file, and we don't do it again. Since the file name is dateified by
+            the modification date/time, we don't need to check the destination file further.
+            We know we already copied that exact file.
+         */
+        File fDestinationFile = new File (String.valueOf(pDestinationFile.toAbsolutePath()));
+        if ( fDestinationFile.exists() ) {
+            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Dest Exists Do Not Copy %s >> %s",
+                    aFilePath.toString(), pDestinationFile.toString()  ));
+            return false;
+        }
+        /*
+            Oh, No! the file does not exist, so Actually Copy the file.
+         */
+        // Try / Catch around the actual copy?
+        try {
+            //Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
+            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Copy %s >> %s",
+                    aFilePath.toString(), pDestinationFile.toString()  ));
+        } catch (Exception e) {
+            //throw new RuntimeException(e);
+            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - EXCEPTION on Copy %s >> %s",
+                    aFilePath.toString(), pDestinationFile.toString()  ));
+            return false;
+        }
+
+
+        return true;
     }
 
 
@@ -199,6 +271,8 @@ public class SSAFilesHelper {
                  */
                 if ( CopyModifiedSourceToDestination( sSourceAbsFilePath, sDestinationPath, sFolderPrefix, sFilePrefix )) {
                     iManyCopied++;
+                }else {
+                    iManySkipped++;
                 }
             }
         }
