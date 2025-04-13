@@ -167,6 +167,7 @@ public class SSController {
         if ( !bImagesValid || intImageIndex >= sImageList.length ) {
             setStatus("OpenImageFromList no images or invalid index");
             lblImageName.setText("");
+            ClearImage();
             return;
         }
         /*
@@ -196,7 +197,9 @@ public class SSController {
         }
         /*
             Fire up the image in the GUI
+            Turn the imageview back on in cased it was turned off
          */
+        imgImageView.setVisible( true );
         anImage = new Image( imageAsStream );
         imgImageView.setImage( anImage );
 
@@ -293,6 +296,17 @@ public class SSController {
         long intEndOpen = System.currentTimeMillis();
         printSysOut(String.format("OpenImageFromList %d ms", intEndOpen - intStartOpen));
     } // OpenImageFromList
+
+    void ClearImage() {
+        /*
+            clear the image we are looking at. Don't change anything else
+         */
+        imgImageView.setVisible( false );
+        lblImageName.setText("");
+        sbImageListScrollBar.setMax( 0 );
+        sbImageListScrollBar.setMin( 0 );
+        sbImageListScrollBar.setValue( 0 );
+    }
 
     /*
         Enable / Disable the function buttons based on whether we have
@@ -456,6 +470,7 @@ public class SSController {
             OpenImageFromList();
             setStatus("First Image Displayed");
         } else {
+            ClearImage();
             setStatus("No images to display");
         }
     }
@@ -506,6 +521,9 @@ public class SSController {
             OpenImageFromList();
             setStatus("Last Image Displayed");
             printSysOut("Last Image Displayed");
+        } else {
+            ClearImage();
+            setStatus("No images to display");
         }
     }
 
@@ -1207,10 +1225,12 @@ public class SSController {
             to get a suffix string for the folder
          */
         String sFolderSuffix = "";
-        if ( bUseFolderSuffix ) {
-            String sFolderSuffixCode = cbChooseFolderSuffix.getValue();
-            if ( !sFolderSuffixCode.isBlank() ) {
-                sFolderSuffix = SSAFilesHelper.GetTodayFolderSuffix( sFolderSuffixCode );
+        if (false) {
+            if (bUseFolderSuffix) {
+                String sFolderSuffixCode = cbChooseFolderSuffix.getValue();
+                if (!sFolderSuffixCode.isBlank()) {
+                    sFolderSuffix = SSAFilesHelper.GetTodayFolderSuffix(sFolderSuffixCode);
+                }
             }
         }
 
@@ -1261,7 +1281,11 @@ public class SSController {
             Set the scroll bar limits to show the position in the list as
             we view images.
          */
-        sbImageListScrollBar.setMax( iHowMany-1 );
+        if ( iHowMany != 0 ) {
+            sbImageListScrollBar.setMax(iHowMany - 1);
+        } else {
+            sbImageListScrollBar.setMax( 1 );
+        }
         sbImageListScrollBar.setMin( 0 );
 
         printSysOut(String.format("GetImagesInFolder found %d files in %s", iHowMany, sImageBasePath));
@@ -1283,8 +1307,13 @@ public class SSController {
             sImageList = sImageFileNames;
             intImageIndex = sImageList.length - 1;
             onGoImagesEnd( actionEvent );
+        } else {
+            bImagesValid = false;
+            sImageList = sImageFileNames;
+            intImageIndex = 0;
+            ClearImage();
         }
-        setStatus(String.format("Source Images Found: %d", sImageFileNames.length));
+        setStatus(String.format("%d Source Images Found", sImageFileNames.length));
     }
 
     /*
@@ -1292,15 +1321,21 @@ public class SSController {
      */
     public void OnViewDestination(ActionEvent actionEvent) {
 
-        String[] sImageFileNames = GetImagesInFolder( txtDestPath.getText(), true , true, false);
+        String[] sImageFileNames = GetImagesInFolder( txtDestPath.getText(), true , false, false);
 
         if (sImageFileNames.length > 0) {
             bImagesValid = true;
             sImageList = sImageFileNames;
             intImageIndex = sImageList.length - 1;
             onGoImagesEnd( actionEvent );
+        } else {
+            bImagesValid = false;
+            sImageList = sImageFileNames;
+            intImageIndex = 0;
+            ClearImage();
+
         }
-        setStatus(String.format("Destination Images Found: %d", sImageFileNames.length));
+        setStatus(String.format("%d Destination Images Found", sImageFileNames.length));
     }
 
     public void ImgOnMouseDragged(MouseEvent mouseEvent) {
