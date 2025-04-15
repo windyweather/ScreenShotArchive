@@ -27,6 +27,7 @@ import javafx.stage.WindowEvent;
 
 import java.io.*;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import static javafx.stage.WindowEvent.*;
@@ -807,6 +808,7 @@ public class SSController {
     public void OnCopySource(ActionEvent actionEvent) throws IOException {
 
 
+
         /*
         public static String  FileHelperCopySource( String sSourcePath, String sDestinationPath,
                                                String sFolderPrefix, String sFilePrefix,
@@ -819,17 +821,32 @@ public class SSController {
         boolean bPreserveFileNames = chkPreserveFileNames.isSelected();
         boolean bSearchSubFolders = chkSearchSubFolders.isSelected();
 
+
         if ( sSourcePath.isBlank() || sDestinationPath.isBlank() ) {
             setStatus("Set Source and Destination Paths to Copy Source Images");
             return;
         }
+
+        /*
+            Confirm the user wants to do this
+         */
+        setStatus("Confirm or Cancel the Copy operation");
+        Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        cnfrmAlert.setTitle("Confirm Copy Source Operation?");
+        cnfrmAlert.setHeaderText( "Confirm Copy Source Images to Destination");
+        cnfrmAlert.setContentText(String.format("Source: %-40s\nDestination: %-40s", sSourcePath, sDestinationPath) );
+        Optional<ButtonType> result = cnfrmAlert.showAndWait();
+        if ( result.isEmpty() || result.get() != ButtonType.OK ) {
+            setStatus( "Copy canceled");
+            return;
+        }
+
         String sCopyStatus;
 
-        sCopyStatus = SSAFilesHelper.FileHelperCopySource( sSourcePath, sDestinationPath,
-                sFolderPrefix, sFilePrefix, bPreserveFileNames, bSearchSubFolders );
+        sCopyStatus = SSAFilesHelper.FileHelperCopySource(sSourcePath, sDestinationPath,
+                sFolderPrefix, sFilePrefix, bPreserveFileNames, bSearchSubFolders);
 
-        setStatus( sCopyStatus );
-
+        setStatus(sCopyStatus);
     }
 
     /*
@@ -841,11 +858,25 @@ public class SSController {
         boolean bSearchSubFolders = chkSearchSubFolders.isSelected();
 
         /*
+            Confirm the user wants to do this
+         */
+        setStatus("Confirm or Cancel the Delete operation");
+        Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        cnfrmAlert.setTitle("Confirm Delete Source Operation?");
+        cnfrmAlert.setHeaderText( "Confirm Delete Source Images");
+        cnfrmAlert.setContentText(String.format("Source: %-40s", sSourcePath ) );
+        Optional<ButtonType> result = cnfrmAlert.showAndWait();
+        if ( result.isEmpty() || result.get() != ButtonType.OK ) {
+            setStatus( "Delete canceled");
+            return;
+        }
+
+        /*
             Depend on the Enable/Disable of the buttons to not send
             us here if we don't belong. LOL
          */
-        String sts = FileHelperCleanSource(  sSourcePath, bSearchSubFolders );
-        setStatus( sts );
+        String sts = FileHelperCleanSource(sSourcePath, bSearchSubFolders);
+        setStatus(sts);
 
     }
 
