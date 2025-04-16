@@ -20,10 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 
 import java.io.*;
 import java.util.Objects;
@@ -759,6 +756,10 @@ public class SSController {
         */
         setStatus("Confirm or Cancel Remove a Pair");
         Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        cnfrmAlert.initOwner( wParent);
+
         cnfrmAlert.setTitle("Confirm Remove Pair?");
         cnfrmAlert.setHeaderText( "Confirm Remove a Pair");
         cnfrmAlert.setContentText(String.format("Pair Name : %-40s", sPairName) );
@@ -851,6 +852,8 @@ public class SSController {
          */
         setStatus("Confirm or Cancel the Copy operation");
         Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        cnfrmAlert.initOwner( wParent);
         cnfrmAlert.setTitle("Confirm Copy Source Operation?");
         cnfrmAlert.setHeaderText( "Confirm Copy Source Images to Destination");
         cnfrmAlert.setContentText(String.format("Source: %-40s\nDestination: %-40s", sSourcePath, sDestinationPath) );
@@ -881,6 +884,8 @@ public class SSController {
          */
         setStatus("Confirm or Cancel the Delete operation");
         Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        cnfrmAlert.initOwner( wParent);
         cnfrmAlert.setTitle("Confirm Delete Source Operation?");
         cnfrmAlert.setHeaderText( "Confirm Delete Source Images");
         cnfrmAlert.setContentText(String.format("Source: %-40s", sSourcePath ) );
