@@ -750,10 +750,29 @@ public class SSController {
             setStatus("Select a pair in list first");
             return;
         }
+
+        SSArchivePair aPair = listPairs.get(idx);
+        String sPairName = aPair.sPairName;
+
+        /*
+        Confirm the user wants to do this
+        */
+        setStatus("Confirm or Cancel Remove a Pair");
+        Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        cnfrmAlert.setTitle("Confirm Remove Pair?");
+        cnfrmAlert.setHeaderText( "Confirm Remove a Pair");
+        cnfrmAlert.setContentText(String.format("Pair Name : %-40s", sPairName) );
+        Optional<ButtonType> result = cnfrmAlert.showAndWait();
+        if ( result.isEmpty() || result.get() != ButtonType.OK ) {
+            setStatus( "Remove canceled");
+            return;
+        }
+
+
         listPairs.remove( idx );
         ClearGuiItems();
         anArchivePair.ClearPair();
-        setStatus(String.format("Pair idx %d removed from list", idx) );
+        setStatus(String.format("Pair name: %s idx %d removed from list", sPairName, idx) );
     }
 
     /*
