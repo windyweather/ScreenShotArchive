@@ -90,6 +90,7 @@ public class SSController {
     public Button btnMovePairTop;
     public Button btnMakeTestPairs;
     public ImageView imgImageView;
+    public MenuItem miReadPairsItem;
 
 
     ObservableList<SSArchivePair> listPairs = FXCollections.observableArrayList();
@@ -359,7 +360,7 @@ public class SSController {
         cbChooseFolderSuffix.getSelectionModel().selectFirst();
 
         /*
-          Wake up the controller to restore the pairs
+          Restore the pairs from an XML file
          */
         printSysOut("SetUpStuff - calling RestorePairsList");
         List<SSArchivePair> listFromXML;
@@ -396,6 +397,45 @@ public class SSController {
         });
 
     }
+
+    /*
+        Read the pairs from
+     */
+    public void OnMenuReadPairs( ActionEvent actionEvent) {
+
+        /*
+        Confirm the user wants to do this
+        */
+        setStatus("Confirm or Cancel the Read Pairs operation");
+        Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        cnfrmAlert.initOwner(wParent);
+        cnfrmAlert.setTitle("Confirm Read Pairs Operation?");
+        cnfrmAlert.setHeaderText("Confirm Read Pairs");
+        cnfrmAlert.setContentText(String.format("Read Pairs will lose any unsaved pairs"));
+        Optional<ButtonType> result = cnfrmAlert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            setStatus("Read Pairs canceled");
+            return;
+        }
+
+      /*
+              Restore the pairs from an XML file
+             */
+        printSysOut("OnMenuReadPairs - calling RestorePairsList");
+        List<SSArchivePair> listFromXML;
+        listFromXML = SSArchivePair.RestorePairListFromXML();
+        setStatus(String.format("%d pairs read", listFromXML.size()));
+
+        /*
+            Put the pairs in the Observable List and tell the listview about them
+            Toss out all the previous  pairs to just read what is in the XML file
+         */
+        listPairs.clear();
+        listPairs.addAll( listFromXML );
+        lvScreenShotPairs.setItems(listPairs);
+    }
+
 
     /*
         Allow manually store pairs at any time,
@@ -1023,10 +1063,6 @@ public class SSController {
      */
     private void SavePairsList() {
 
-        /*
-            Clear out the Prefs that we don't use any more
-         */
-        SSArchivePair.ClearPairStore();
 
         if ( !SSArchivePair.SavePairListToXML( listPairs ) ){
             setStatus("Error saving pairs");

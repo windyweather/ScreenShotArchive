@@ -15,6 +15,7 @@
                         <Menu mnemonicParsing="false" text="File">
                             <items>
                                 <MenuItem id="miSavePairsMenuItem" fx:id="miSavePairs" mnemonicParsing="false" onAction="#OnMenuSavePairs" text="Save Pairs" />
+                        <MenuItem id="miReadPairsMenuItem" fx:id="miReadPairsItem" mnemonicParsing="false" onAction="#OnMenuReadPairs" text="Read Pairs" />
                                 <MenuItem id="miCloseApplication" fx:id="miCloseApplication" mnemonicParsing="false" onAction="#OnMenuCloseApplication" text="Close" />
                             </items>
                         </Menu>

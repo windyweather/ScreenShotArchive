@@ -33,29 +33,6 @@ public class SSArchivePair {
     //public Boolean bTestLogOnly;                // during copy / delete operation provide log entries only.
                                                 // do not modify files
 
-    /*
-    Names of preferences. All but NUMBER_PAIRS have index appended
-     */
-    private static final String NUMBER_PAIRS = "NUMBER_PAIRS";
-    private static final String PAIR_NAME = "PAIR_NAME_%d";
-    private static final String PAIR_SRC_PATH = "PAIR_SRC_PATH_%d";
-    private static final String PAIR_DST_PATH = "PAIR_DST_PATH_%d";
-    private static final String PAIR_FOLDER_SFX = "PAIR_FOLDER_SFX_%d";
-    private static final String PAIR_FILE_PFX = "PAIR_FILE_PFX_%d";
-    private static final String PAIR_SEARCH_SUB_FOLDERS = "PAIR_SEARCH_SUB_FOLDERS_%d";
-    private static final String PAIR_PRESERVE_FILE_NAMES = "PAIR_PRESERVE_FILE_NAMES_%d";
-
-    /*
-        Qualified Preference Name Strings
-     */
-
-    private static String sQPairName; // = String.format(PAIR_NAME, idx);
-    private static String sQPairSrcPath;// = String.format(PAIR_SRC_PATH, idx);
-    private static String sQPairDstPath;// = String.format(PAIR_DST_PATH, idx);
-    private static String sQPairFolderSfx; // = String.format(PAIR_FOLDER_SFX, idx);
-    private static String sQPairFilePfx; // = String.format(PAIR_FILE_PFX, idx);
-    private static String sQPairSearchSubFolders; // = String.format(PAIR_SEARCH_SUB_FOLDERS, idx);
-    private static String sQPairPreserveFileNames; // = String.format(PAIR_PRESERVE_FILE_NAMES, idx);
 
     /*
         let's make one
@@ -65,115 +42,11 @@ public class SSArchivePair {
     }
 
     /*
-    based on current contents of source path, request a new path with a folder dialog
-     */
-    public void AskForSourcePath( Window parent ) {
-
-    }
-    /*
-    based on current contents of destination path, request a new path with a folder dialog
-     */
-    public void AskForDestinationPath( Window parent ) {
-
-    }
-
-    /*
         for Debugging. Just print out the pair we are looking at
      */
 
     public void PrintPair() {
         printSysOut( String.format("PairName:%s Src:%s Dst:%s", sPairName, sSourcePath, sDestinationPath));
-    }
-    /*
-        Get / Put the number of pairs in the preferences store
-     */
-    public int GetNumberPairs( ) {
-        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
-        return pref.getInt(NUMBER_PAIRS, 0);
-    }
-
-    public void PutNumberPairs( int numPairs ){
-        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
-        pref.putInt( NUMBER_PAIRS, numPairs );
-    }
-
-    public void RemoveNumberPairs() {
-        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
-        pref.remove( NUMBER_PAIRS );
-    }
-
-    /*
-        Make the names to get or put the prefs for this pair
-     */
-    private void GetQualifiedPrefNames( int idx ) {
-         sQPairName = String.format(PAIR_NAME, idx);
-         sQPairSrcPath = String.format(PAIR_SRC_PATH, idx);
-         sQPairDstPath = String.format(PAIR_DST_PATH, idx);
-         sQPairFolderSfx = String.format(PAIR_FOLDER_SFX, idx);
-         sQPairFilePfx = String.format(PAIR_FILE_PFX, idx);
-         sQPairSearchSubFolders = String.format(PAIR_SEARCH_SUB_FOLDERS, idx);
-         sQPairPreserveFileNames = String.format(PAIR_PRESERVE_FILE_NAMES, idx);
-    }
-
-    public boolean GetPairFromStore( int idx ) {
-
-        GetQualifiedPrefNames( idx );
-
-        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
-        sPairName = pref.get(sQPairName, "");
-        sSourcePath = pref.get(sQPairSrcPath, "");
-        sDestinationPath = pref.get(sQPairDstPath, "");
-        sFolderSuffix = pref.get(sQPairFolderSfx, "yyyy_MM");
-        sFilePrefix = pref.get(sQPairFilePfx, "");
-        bSearchSubFolders = pref.getBoolean(sQPairSearchSubFolders, false);
-        bPreserveFileNames = pref.getBoolean(sQPairPreserveFileNames, false);
-
-        printSysOut("GetPairFromStore:");
-        PrintPair();
-
-        return !sPairName.isBlank(); //!isEmpty(sPairName);
-    }
-
-
-
-    /*
-        Remove this pair from the Pref Store
-     */
-    private void RemovePairFromStore( int idx ) {
-
-        /*
-          Remove the pair from Store. Ignore the local contents
-         */
-        GetQualifiedPrefNames( idx );
-
-        /*
-            remove the qualified nodes from the Pref Store
-         */
-        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
-        pref.remove(sQPairName);
-        pref.remove(sQPairSrcPath);
-        pref.remove(sQPairDstPath);
-        pref.remove(sQPairFolderSfx);
-        pref.remove(sQPairFilePfx);
-        pref.remove(sQPairSearchSubFolders);
-        pref.remove(sQPairPreserveFileNames);
-
-    }
-
-    /*
-        We are retiring the old Preferences based Pair Store, so clear it out
-        for good.
-     */
-    public static void ClearPairStore( ) {
-
-        SSArchivePair aPair = new SSArchivePair();
-
-        int numPairs = aPair.GetNumberPairs();
-
-        for ( int i=0; i < numPairs; i++) {
-            aPair.RemovePairFromStore( i );
-        }
-        aPair.RemoveNumberPairs();
     }
 
     /*
@@ -249,13 +122,6 @@ public class SSArchivePair {
 
         return listFromXML;
     }
-
-
-
-
-
-
-
 
 
 
