@@ -10,7 +10,9 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -46,9 +48,8 @@ public class SSAFilesHelper {
         }
         if ( !sDateFormat.isBlank() ) {
 
-            FileTime fileTime = ftModified;
-            ZonedDateTime zonedDateTime = ZonedDateTime.parse(fileTime.toString());
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern(sDateFormat);
+            ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(ftModified.toInstant(), ZoneId.systemDefault());
+                      DateTimeFormatter dtf = DateTimeFormatter.ofPattern(sDateFormat);
             sDateFolderPrefix = dtf.format(zonedDateTime);
             //SSController.printSysOut( String.format("GetDateFolderPrefix - %s", sDateFolderPrefix ) );
 
@@ -153,10 +154,11 @@ public class SSAFilesHelper {
         Path aFilePath = Paths.get(sSourceAbsFilePath);
         String sSourceExtension = FilenameUtils.getExtension(sSourceAbsFilePath);
         FileTime ftModified = Files.getLastModifiedTime(aFilePath);
-        /*
+
+         /*
             Get a subfolder based on the folder prefix and the modified date of the source file.
          */
-        String sDateFolderPrefix = GetDateFolderPrefix(ftModified, sFolderPrefix);
+        String sDateFolderPrefix = GetDateFolderPrefix( ftModified, sFolderPrefix);
         String sDestAbsFilePathDir = sDestinationPath;
         if (!sDateFolderPrefix.isBlank()) {
             sDestAbsFilePathDir += File.separator + sDateFolderPrefix;
