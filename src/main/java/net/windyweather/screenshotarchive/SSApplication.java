@@ -15,18 +15,8 @@ import static net.windyweather.screenshotarchive.SSController.printSysOut;
 //make a change
 public class SSApplication extends Application {
 
-
-    public static final String WINDOW_POSITION_X = "Window_Position_X";
-    public static final String WINDOW_POSITION_Y = "Window_Position_Y";
-    public static final String WINDOW_WIDTH = "Window_Width";
-    public static final String WINDOW_HEIGHT = "Window_Height";
-    private static final double DEFAULT_X = 10;
-    private static final double DEFAULT_Y = 10;
-    private static final double DEFAULT_WIDTH = 800;
-    private static final double DEFAULT_HEIGHT = 800;
-    public static final String NODE_NAME = "ScreenShotArchive";
-    //private static final String BUNDLE = "Bundle";
-
+    public static final String ORGANIZATION = "windyweather";
+    public static final String APPLICATIONNAME = "ScreenShotArchive";
 
 
     @Override
@@ -49,25 +39,14 @@ public class SSApplication extends Application {
             }
         });
         stage.show();
-        /* very cool way to save and restore window size and position.
-          David Bell's blog
-          Found at: https://broadlyapplicable.blogspot.com/2015/02/javafx-restore-window-size-position.html
-          Thanks David Bell from February 23, 2015,
-          JavaFX Restore Window Size & Position
+
+        /*
+            Use our fancy new XML file reader to restore the window pos/size
+            window.xml is added to the app name. It must not collide with the Pairs.xml file.
          */
-        // Pull the saved preferences and set the stage size and start location
+        WindowSaveRestore.RestoreWindowPosSize( stage, ORGANIZATION, APPLICATIONNAME);
 
-        Preferences pref = Preferences.userRoot().node(NODE_NAME);
-        double x = pref.getDouble(WINDOW_POSITION_X, DEFAULT_X);
-        double y = pref.getDouble(WINDOW_POSITION_Y, DEFAULT_Y);
-        double width = pref.getDouble(WINDOW_WIDTH, DEFAULT_WIDTH);
-        double height = pref.getDouble(WINDOW_HEIGHT, DEFAULT_HEIGHT);
-        stage.setX(x);
-        stage.setY(y);
-        stage.setWidth(width);
-        stage.setHeight(height);
-
-        printSysOut(String.format("App Start: Restore Window Pos/Size  [%.0f,%.0f] / [%.0f,%.0f]", x,y, width, height) );
+        printSysOut("App Start") ;
 
     }
 

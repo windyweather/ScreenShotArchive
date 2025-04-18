@@ -23,26 +23,25 @@ import javafx.scene.input.ScrollEvent;
 import javafx.stage.*;
 
 import java.io.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import static javafx.stage.WindowEvent.*;
 import static net.windyweather.screenshotarchive.SSAFilesHelper.FileHelperCleanSource;
-import static net.windyweather.screenshotarchive.SSApplication.NODE_NAME;
-import static net.windyweather.screenshotarchive.SSApplication.WINDOW_POSITION_X;
-import static net.windyweather.screenshotarchive.SSApplication.WINDOW_POSITION_Y;
-import static net.windyweather.screenshotarchive.SSApplication.WINDOW_WIDTH;
-import static net.windyweather.screenshotarchive.SSApplication.WINDOW_HEIGHT;
 
 // See if we can find DirectoryScanner somewhere
 import org.codehaus.plexus.util.DirectoryScanner;
+
 
 /*
     The controller drives the GUI or vice versa
  */
 public class SSController {
     private static final String FOLDER_SUFFIX_DEFAULT = "yyyy_MM";
+    public static final String ORGANIZATION = "windyweather";
+    public static final String APPLICATIONNAME = "ScreenShotArchive";
 
     public Button btnUpdatePair;
     public Button btnRemovePair;
@@ -363,7 +362,16 @@ public class SSController {
           Wake up the controller to restore the pairs
          */
         printSysOut("SetUpStuff - calling RestorePairsList");
-        RestorePairsList();
+        List<SSArchivePair> listFromXML;
+        listFromXML = SSArchivePair.RestorePairListFromXML();
+        setStatus(String.format("%d pairs restored", listFromXML.size()));
+
+        /*
+            Put the pairs in the Observable List and tell the listview about them
+         */
+        listPairs.addAll( listFromXML );
+        lvScreenShotPairs.setItems(listPairs);
+
         printSysOut("SetUpStuff - back from RestorePairsList");
 
         /*
@@ -372,16 +380,6 @@ public class SSController {
         //printSysOut("SetUpStuff - if we have pairs, load up the first one");
 
 
-        /*
-        set some paths for testing
-        obsolete now that we are saving / restoring pairs
-         */
-        if ( false ) {
-            String sTestImagePath = "D:\\MMO_Pictures\\AlienBlackout";
-
-            txtSourcePath.setText(sTestImagePath);
-            txtDestPath.setText(sTestImagePath);
-        }
 
         intImageIndex = 0;
         bImagesValid = false;
@@ -444,20 +442,13 @@ public class SSController {
         stage.setResizable(false);
         stage.initOwner( stageOfUs );
 
-        // get the controller so we can call it with window events
-        //ssCtrl = (SSController) fxmlLoader.getController();
-        stage.addEventHandler( WindowEvent.ANY, new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                aboutControl.handleWindowEvent(event);
-            }
-        });
-
 
         printSysOut("onAbout - show about dialog");
         stage.show();
-        // get the controller so we can call it with window events
-        //aboutControl.SetStuffUp();
+        /*
+            About dialog code gets control in initialize() where
+            it can carry on with fixing stuff up
+         */
 
     }
 
@@ -980,11 +971,11 @@ public class SSController {
             if a menu item or button closed the app.
          */
         Stage stage = (Stage)splitPaneOutsideContainer.getScene().getWindow();
-        Preferences preferences = Preferences.userRoot().node(NODE_NAME);
-        preferences.putDouble(WINDOW_POSITION_X, stage.getX());
-        preferences.putDouble(WINDOW_POSITION_Y, stage.getY());
-        preferences.putDouble(WINDOW_WIDTH, stage.getWidth());
-        preferences.putDouble(WINDOW_HEIGHT, stage.getHeight());
+
+        /*
+            Call the shiny new Window XML Save
+         */
+        WindowSaveRestore.SaveWindowPosSize( stage );
     }
     /*
     Save the windows pos/size and save the pairs
@@ -1027,126 +1018,21 @@ public class SSController {
     }
 
 
-
-
-    //
-    // Restore the Pair List File from Preferences
-    //
-    public void RestorePairsList() {
-
-        printSysOut("RestorePairsList starting");
-        /*
-            All the methods to restore are in the SSArchivePair class
-         */
-        int numPairs = anArchivePair.GetNumberPairs();
-        printSysOut(String.format("%d pairs found in store", numPairs));
-
-        for (int i = 0; i < numPairs; i++) {
-            if (!anArchivePair.GetPairFromStore(i)) {
-                printSysOut(String.format("Missing pair %d", i));
-            }
-            else {
-                printSysOut(String.format("Found Pair %d in Store", i));
-                PrintAPair("anArchivePair", anArchivePair);
-                SSArchivePair aPair = MakePairForList();
-                listPairs.addLast(aPair);
-            }
-        }
-
-        /*
-            Gotta tell the ListView about the list again or once?
-            Anyway, apparently every time.
-            Then select and focus on first one
-            ok if none, I guess.
-         */
-        lvScreenShotPairs.setItems(listPairs);
-        int numFound = listPairs.size();
-        if (numFound != 0) {
-            SelectAndFocusIndex( 0);
-            anArchivePair = listPairs.get( 0 );
-            PutGuiFromPair();
-            setStatus(String.format("%d pairs restored", numFound));
-        } else {
-            setStatus("No pairs found to restore");
-        }
-    }
-
     /*
-        Save the list of pairs in the store
+        Save the pairs to an XML file
      */
     private void SavePairsList() {
-        printSysOut("SavePairsList - starting");
-        // see how many pairs we have to save
-        int numPairs = listPairs.size();
-        if (numPairs == 0 ) {
-            // clear items from the store just to clean it out
-            // There might be stuff left in the store, but we have
-            // no pairs now.
-            int oldPairs = anArchivePair.GetNumberPairs();
-            if (oldPairs != 0) {
-                printSysOut(String.format("No Pairs to save. Clearing Store of %d old pairs", oldPairs) );
-                anArchivePair.ClearPairStore(oldPairs);
-            } else {
-                printSysOut("No old pairs to clear from store");
-            }
-            /*
-                Notice that if we store fewer than we had before,
-                we leave the few at the end in the store.
-                Not a problem I think.
-             */
-            // make sure we update the store to say none
-            anArchivePair.PutNumberPairs( numPairs );
-            printSysOut("Store cleared");
-            return;
-        }
-        for (int i=0; i < numPairs; i++) {
-            SSArchivePair pair = listPairs.get(i);
-            PrintAPair( "Storing Pair", pair);
-            pair.PutPairToStore( i );
-        }
-        anArchivePair.PutNumberPairs( numPairs );
-        printSysOut(String.format("SavePairsList - complete %d pairs", numPairs) );
-    }
 
-    /*
-    Just keep this code for testing if we need it
-     */
-    void RestoreAPairForTesting(){
         /*
-          For testing, just read the first pair and stuff it in the GUI
+            Clear out the Prefs that we don't use any more
          */
-        if (!anArchivePair.GetPairFromStore(0)) {
-            anArchivePair.ClearPair();
-            setStatus("No pairs to restore");
-            printSysOut( "No pairs to restore");
+        SSArchivePair.ClearPairStore();
+
+        if ( !SSArchivePair.SavePairListToXML( listPairs ) ){
+            setStatus("Error saving pairs");
+        } else {
+            setStatus("Pairs saved");
         }
-        else {
-            setStatus("Pair idx 0 restored");
-            printSysOut("Pair idx 0 restored");
-            printSysOut(String.format("anArchivePair: Src:%s -- Dst:%s", anArchivePair.sSourcePath, anArchivePair.sDestinationPath));
-        }
-        PutGuiFromPair();
-
-        printSysOut("RestorePairsList ");
-        setStatus("Pairs restored");
-    }
-
-    /*
-      store the gui to the defaults file
-      Keep this code for testing.
-    */
-    private void SavePairsListForTesting()
-    {
-       /*
-        use Preferences class
-        For testing just use idx 0
-        */
-
-        GetPairFromGui();
-        printSysOut("SavePairsList");
-        printSysOut(String.format("anArchivePair: Src:%s -- Dst:%s", anArchivePair.sSourcePath, anArchivePair.sDestinationPath));
-        anArchivePair.PutPairToStore( 0 );
-        setStatus("Pairs saved");
     }
 
     /*
@@ -1240,9 +1126,14 @@ public class SSController {
         intTestPairIdx++;
         return pair;
     }
+
+
+    /*
+        make some test pairs
+     */
     public void OnMakeTestPairs(ActionEvent actionEvent) {
 
-        if (false) {
+        if (true) {
             printSysOut("OnMakeTestPairs - make some test pairs");
             for (int i = 0; i < 10; i++) {
                 listPairs.add(FillTestPair());

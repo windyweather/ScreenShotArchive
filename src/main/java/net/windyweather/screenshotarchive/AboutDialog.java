@@ -71,35 +71,6 @@ public class AboutDialog {
         stage.close();
     }
 
-    // handle window events here in the controller so we have access to
-    // All the items and methods of the window. At last at WINDOW_SHOW and beyond.
-    public void handleWindowEvent(WindowEvent event) {
-        EventType<WindowEvent> state = event.getEventType();
-        if (state == WINDOW_SHOWN) {
-            System.out.println("About Window shown");
-            /*
-                We have to wait until here to rewrite the TextArea with the
-                content with new lines in it. DOESN'T WORK
-             */
-            //SetStuffUp();
-        }
-        if (state == WINDOW_SHOWING) {
-            System.out.println("About Window showing");
-            /*
-                We have to wait until here to rewrite the TextArea with the
-                content with new lines in it. DOESN'T WORK
-             */
-            //SetStuffUp();
-        }
-
-        else if (state == WINDOW_HIDING) {
-            System.out.println("About Window hiding");
-        }
-        else if ( state == WINDOW_CLOSE_REQUEST) {
-            System.out.println("About Window close request");
-        }
-    }
-
     /*
         We have to do the link ourselves
      */

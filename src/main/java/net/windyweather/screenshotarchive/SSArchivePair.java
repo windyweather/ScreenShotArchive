@@ -1,9 +1,18 @@
 package net.windyweather.screenshotarchive;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
 import javafx.stage.Window;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
+import static net.windyweather.screenshotarchive.SSApplication.APPLICATIONNAME;
+import static net.windyweather.screenshotarchive.SSApplication.ORGANIZATION;
 import static net.windyweather.screenshotarchive.SSController.printSysOut;
 //import static sun.util.locale.LocaleUtils.isEmpty;
 
@@ -79,13 +88,18 @@ public class SSArchivePair {
         Get / Put the number of pairs in the preferences store
      */
     public int GetNumberPairs( ) {
-        Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
+        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
         return pref.getInt(NUMBER_PAIRS, 0);
     }
 
     public void PutNumberPairs( int numPairs ){
-        Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
+        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
         pref.putInt( NUMBER_PAIRS, numPairs );
+    }
+
+    public void RemoveNumberPairs() {
+        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
+        pref.remove( NUMBER_PAIRS );
     }
 
     /*
@@ -105,7 +119,7 @@ public class SSArchivePair {
 
         GetQualifiedPrefNames( idx );
 
-        Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
+        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
         sPairName = pref.get(sQPairName, "");
         sSourcePath = pref.get(sQPairSrcPath, "");
         sDestinationPath = pref.get(sQPairDstPath, "");
@@ -120,31 +134,7 @@ public class SSArchivePair {
         return !sPairName.isBlank(); //!isEmpty(sPairName);
     }
 
-    /*
-        Store the pair only if the Pair Name is Not Empty
-     */
-    public boolean PutPairToStore( int idx ) {
 
-        printSysOut("PutPairToStore:");
-        PrintPair();
-
-        if ( sPairName.isEmpty() ) {
-            return false;
-        }
-        GetQualifiedPrefNames( idx );
-
-        Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
-        pref.put(sQPairName, sPairName);
-        pref.put(sQPairSrcPath, sSourcePath);
-        pref.put(sQPairDstPath, sDestinationPath);
-        pref.put(sQPairFolderSfx, sFolderSuffix);
-        pref.put(sQPairFilePfx, sFilePrefix);
-        pref.putBoolean(sQPairSearchSubFolders, bSearchSubFolders);
-        pref.putBoolean(sQPairPreserveFileNames, bPreserveFileNames);
-
-        return true;
-
-    }
 
     /*
         Remove this pair from the Pref Store
@@ -159,7 +149,7 @@ public class SSArchivePair {
         /*
             remove the qualified nodes from the Pref Store
          */
-        Preferences pref = Preferences.userRoot().node(SSApplication.NODE_NAME);
+        Preferences pref = Preferences.userRoot().node(APPLICATIONNAME);
         pref.remove(sQPairName);
         pref.remove(sQPairSrcPath);
         pref.remove(sQPairDstPath);
@@ -171,13 +161,19 @@ public class SSArchivePair {
     }
 
     /*
-        Clear out old pairs from the store when we have none to save
+        We are retiring the old Preferences based Pair Store, so clear it out
+        for good.
      */
-    public void ClearPairStore( int numPairs ) {
+    public static void ClearPairStore( ) {
+
+        SSArchivePair aPair = new SSArchivePair();
+
+        int numPairs = aPair.GetNumberPairs();
 
         for ( int i=0; i < numPairs; i++) {
-            RemovePairFromStore( i );
+            aPair.RemovePairFromStore( i );
         }
+        aPair.RemoveNumberPairs();
     }
 
     /*
@@ -193,9 +189,79 @@ public class SSArchivePair {
         bPreserveFileNames = false;
     }
 
+    private static String MakePairsXmlPath() {
+
+        String currentUsersHomeDir = System.getProperty("user.home");
+        String sXMLPairsPath = currentUsersHomeDir + File.separator + "." + ORGANIZATION
+                + File.separator + APPLICATIONNAME + "Pairs.xml";
+        return sXMLPairsPath;
+    }
+
+    /*
+        SavePairListToXML
+     */
+
+    public static boolean SavePairListToXML( ObservableList<SSArchivePair> olPairs ) {
+        XMLEncoder encoder = null;
+        String sXMLPairsListPath = MakePairsXmlPath();
+        /*
+            Convert Observable List to normal list
+         */
+        List<SSArchivePair> listOfPairs = new ArrayList<>(100);
+        listOfPairs.addAll( olPairs );
+
+        try{
+            encoder=new XMLEncoder(new BufferedOutputStream(new FileOutputStream( sXMLPairsListPath )));
+        }catch( Exception e ){
+            printSysOut( String.format("SavePairsList: Error: %s Creating or Opening the xml file %s", e, sXMLPairsListPath) );
+            return false;
+        }
+
+        encoder.writeObject( listOfPairs );
+
+        printSysOut( String.format("SavePairListToXML: stored %d pairs to %s", listOfPairs.size(), sXMLPairsListPath));
+        encoder.close();
+        return true;
+    }
+
+    /*
+        Restore the pair list from XML
+     */
+    public static List<SSArchivePair> RestorePairListFromXML() {
+        List<SSArchivePair> listOfPairs = new ArrayList<>(100);
+        XMLEncoder encoder = null;
+        String sXMLPairsListPath = MakePairsXmlPath();
+
+
+        // Use XMLDecoder to read the XML file in.
+        List<SSArchivePair> listFromXML = List.of();
+        try {
+            printSysOut("RestorePairListFromXML");
+            final XMLDecoder decoder = new XMLDecoder(new FileInputStream(sXMLPairsListPath));
+            listFromXML = (List<SSArchivePair>) decoder.readObject();
+            decoder.close();
+            printSysOut(String.format("%d pairs restored", listFromXML.size()));
+
+        } catch (Exception e) {
+            printSysOut(String.format("Pairs Not Restored %s", sXMLPairsListPath));
+        }
+        printSysOut(String.format("RestorePairListFromXML %d pairs restored", listFromXML.size() ));
+
+        return listFromXML;
+    }
+
+
+
+
+
+
+
+
+
+
     /*
     ToString is called to render the item for the ListView
- */
+    */
     @Override
     public String toString() {
         return String.format("PairName: " + sPairName + " Source: " + sSourcePath
