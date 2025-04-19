@@ -52,6 +52,10 @@ public class AboutDialog {
         taAboutText.setEditable( false );
         taAboutText.deselect();
         taAboutText.home();
+        /*
+            Put the version number in the dialog
+         */
+        lblSSAVersion.setText( "Version " + SSApplication.APP_VERSION);
     }
 
     /*

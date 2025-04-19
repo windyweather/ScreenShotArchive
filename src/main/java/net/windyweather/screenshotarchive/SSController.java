@@ -1,5 +1,6 @@
 package net.windyweather.screenshotarchive;
 
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,9 +18,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.*;
 
 import java.io.*;
@@ -32,6 +36,7 @@ import static javafx.stage.WindowEvent.*;
 import static net.windyweather.screenshotarchive.SSAFilesHelper.FileHelperCleanSource;
 
 // See if we can find DirectoryScanner somewhere
+import javafx.util.Callback;
 import org.codehaus.plexus.util.DirectoryScanner;
 
 
@@ -91,10 +96,16 @@ public class SSController {
     public Button btnMakeTestPairs;
     public ImageView imgImageView;
     public MenuItem miReadPairsItem;
+    public TableView<SSArchivePair> tvPairsTable;
+    public TableColumn<SSArchivePair, String> tcPairName;
+    public TableColumn<SSArchivePair, String> tcPairSourcePath;
 
 
     ObservableList<SSArchivePair> listPairs = FXCollections.observableArrayList();
-    public ListView<SSArchivePair> lvScreenShotPairs;
+    /*
+        Change from ListView to TableView
+     */
+    //public ListView<SSArchivePair> lvScreenShotPairs;
 
 
     @FXML
@@ -295,15 +306,31 @@ public class SSController {
         printSysOut(String.format("OpenImageFromList %d ms", intEndOpen - intStartOpen));
     } // OpenImageFromList
 
+    /*
+        make a tiny image just to remove any references
+        to image files. 1 pixel, all white
+     */
+    public Image generateImage() {
+        WritableImage img = new WritableImage(1, 1);
+        PixelWriter pw = img.getPixelWriter();
+
+        Color color = Color.color(1, 1, 1, 1.0);
+        pw.setColor(0, 0, color);
+        return img ;
+    }
+
+
     void ClearImage() {
         /*
             clear the image we are looking at. Don't change anything else
          */
         imgImageView.setVisible( false );
+        imgImageView.setImage( generateImage() );
         lblImageName.setText("");
         sbImageListScrollBar.setMax( 0 );
         sbImageListScrollBar.setMin( 0 );
         sbImageListScrollBar.setValue( 0 );
+
     }
 
     /*
@@ -358,6 +385,10 @@ public class SSController {
         ObservableList<String> sol = FXCollections.observableArrayList("yyyy_MM", "", "yyyy_MM_dd");
         cbChooseFolderSuffix.setItems(sol);
         cbChooseFolderSuffix.getSelectionModel().selectFirst();
+        /*
+        show or hide the make test pairs button
+         */
+        btnMakeTestPairs.setVisible( chkTestLogOnly.isSelected() );
 
         /*
           Restore the pairs from an XML file
@@ -371,7 +402,7 @@ public class SSController {
             Put the pairs in the Observable List and tell the listview about them
          */
         listPairs.addAll( listFromXML );
-        lvScreenShotPairs.setItems(listPairs);
+        tvPairsTable.setItems(listPairs);
 
         printSysOut("SetUpStuff - back from RestorePairsList");
 
@@ -396,6 +427,39 @@ public class SSController {
             EnableFunctionButtons();
         });
 
+        printSysOut("Set up CellValueFactories for Columns");
+
+        tcPairName.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<SSArchivePair, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call( TableColumn.CellDataFeatures<SSArchivePair,
+                    String> p) {
+                //printSysOut("tcPairName CellValueFactory called");
+                return p.getValue().sPairNameProperty();
+            }
+        });
+
+
+        tcPairSourcePath.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<SSArchivePair, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call( TableColumn.CellDataFeatures<SSArchivePair,
+                    String> p) {
+                //printSysOut("tcPairSourcePath CellValueFactory called");
+                return p.getValue().sPairSourcePathProperty();
+            }
+        });
+
+
+        /*
+          We don't care what OS, but just check in case later we care
+         */
+        if (isOsWindows() )
+        {
+            printSysOut("Windows platform");
+        }
+        else if (isOsLinux()) {
+            printSysOut( "Linux Platform");
+        }
+        else {
+            printSysOut( "Unknown Platform");
+        }
     }
 
     /*
@@ -408,7 +472,7 @@ public class SSController {
         */
         setStatus("Confirm or Cancel the Read Pairs operation");
         Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        Window wParent = tvPairsTable.getScene().getWindow();
         cnfrmAlert.initOwner(wParent);
         cnfrmAlert.setTitle("Confirm Read Pairs Operation?");
         cnfrmAlert.setHeaderText("Confirm Read Pairs");
@@ -433,7 +497,7 @@ public class SSController {
          */
         listPairs.clear();
         listPairs.addAll( listFromXML );
-        lvScreenShotPairs.setItems(listPairs);
+        tvPairsTable.setItems(listPairs);
     }
 
 
@@ -558,11 +622,11 @@ public class SSController {
 
 
     /*
-        Handle events from the List View of pairs
+        Handle events from the Table View of pairs
      */
-    public void OnListViewMouseClicked(MouseEvent mouseEvent) {
+    public void OnTableViewMouseClicked(MouseEvent mouseEvent) {
 
-        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        int idx = tvPairsTable.getSelectionModel().getSelectedIndex();
 
         printSysOut(String.format("OnListViewMouseClicked - click with Idx %d", idx) );
         if ( idx == -1 ) {
@@ -585,7 +649,7 @@ public class SSController {
         It must be the most frequent game you play
      */
     public void OnMovePairTop(ActionEvent actionEvent) {
-        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        int idx = tvPairsTable.getSelectionModel().getSelectedIndex();
         if ( idx == 0 ) {
             setStatus( "Pair is already at the top of the list");
             printSysOut("OnMovePairTop - already at top");
@@ -601,7 +665,7 @@ public class SSController {
     }
 
     public void OnMovePairUp(ActionEvent actionEvent) {
-        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        int idx = tvPairsTable.getSelectionModel().getSelectedIndex();
         if ( idx == 0 ) {
             // already at top so we are done
             printSysOut(String.format("OnMovePairUp - idx %d already at top", idx ) );
@@ -618,7 +682,7 @@ public class SSController {
     }
 
     public void OnMovePairDown(ActionEvent actionEvent) {
-        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        int idx = tvPairsTable.getSelectionModel().getSelectedIndex();
         if ( (idx+1) == listPairs.size() ) {
             // already at bottom so we are done
             printSysOut(String.format("OnMovePairDown - idx %d already at bottom", idx ) );
@@ -688,12 +752,12 @@ public class SSController {
     Make sure item of interest is selected and visible
     */
     private void SelectAndFocusIndex( int idx ) {
-        lvScreenShotPairs.getSelectionModel().select(idx);
-        if (!lvScreenShotPairs.isVisible() ){
-            lvScreenShotPairs.getFocusModel().focus(idx);
-            lvScreenShotPairs.scrollTo( idx);
+        tvPairsTable.getSelectionModel().select(idx);
+        if (!tvPairsTable.isVisible() ){
+            tvPairsTable.getFocusModel().focus(idx);
+            tvPairsTable.scrollTo( idx);
         }
-        lvScreenShotPairs.scrollTo( idx);
+        tvPairsTable.scrollTo( idx);
     }
 
     /*
@@ -751,7 +815,7 @@ public class SSController {
             Gotta tell the ListView about the list again or once?
             Anyway, apparently every time.
          */
-            lvScreenShotPairs.setItems(listPairs);
+            tvPairsTable.setItems(listPairs);
             int idx = listPairs.size() - 1;
             intImageIndex = idx;
             SelectAndFocusIndex(idx);
@@ -772,7 +836,7 @@ public class SSController {
             Assume whole list will be saved on close, or
             user will "Save Pairs" to update the store.
          */
-        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        int idx = tvPairsTable.getSelectionModel().getSelectedIndex();
         if (idx == -1)
         {
             setStatus("Select a pair in list first");
@@ -788,7 +852,7 @@ public class SSController {
         setStatus("Confirm or Cancel Remove a Pair");
         Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
 
-        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        Window wParent = tvPairsTable.getScene().getWindow();
         cnfrmAlert.initOwner( wParent);
 
         cnfrmAlert.setTitle("Confirm Remove Pair?");
@@ -816,7 +880,7 @@ public class SSController {
          Copy GUI back into the local pair, and then
          put a copy in the listPairs to update the ListView.
          */
-        int idx = lvScreenShotPairs.getSelectionModel().getSelectedIndex();
+        int idx = tvPairsTable.getSelectionModel().getSelectedIndex();
         if (idx == -1)
         {
             setStatus("Select a pair in list first");
@@ -847,7 +911,7 @@ public class SSController {
             Gotta tell the ListView about the list again or once?
             Anyway, apparently every time.
          */
-        lvScreenShotPairs.setItems( listPairs );
+        tvPairsTable.setItems( listPairs );
         SelectAndFocusIndex( idx);
         setStatus("Pair updated in the list");
     }
@@ -883,7 +947,7 @@ public class SSController {
          */
         setStatus("Confirm or Cancel the Copy operation");
         Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        Window wParent = tvPairsTable.getScene().getWindow();
         cnfrmAlert.initOwner( wParent);
         cnfrmAlert.setTitle("Confirm Copy Source Operation?");
         cnfrmAlert.setHeaderText( "Confirm Copy Source Images to Destination");
@@ -893,6 +957,12 @@ public class SSController {
             setStatus( "Copy canceled");
             return;
         }
+
+        /*
+            Update the pair - just in case they forgot
+         */
+        OnUpdatePair( actionEvent );
+
 
         String sCopyStatus;
 
@@ -915,7 +985,7 @@ public class SSController {
          */
         setStatus("Confirm or Cancel the Delete operation");
         Alert cnfrmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        Window wParent = lvScreenShotPairs.getScene().getWindow();
+        Window wParent = tvPairsTable.getScene().getWindow();
         cnfrmAlert.initOwner( wParent);
         cnfrmAlert.setTitle("Confirm Delete Source Operation?");
         cnfrmAlert.setHeaderText( "Confirm Delete Source Images");
@@ -925,6 +995,16 @@ public class SSController {
             setStatus( "Delete canceled");
             return;
         }
+        /*
+            Any open image will not be deleted
+            so forget the display to allow all files to be deleted.
+         */
+        ClearImageDisplay();
+
+        /*
+            Update the pair - just in case they forgot
+         */
+        OnUpdatePair( actionEvent );
 
         /*
             Depend on the Enable/Disable of the buttons to not send
@@ -959,7 +1039,7 @@ public class SSController {
     /*
     Go find our saved windows pos/size and saved pairs
      */
-    public void OnWindowShown( WindowEvent evt) {
+    public void OnWindowShownxx( WindowEvent evt) {
 
         // initialize combo box choices
         ObservableList<String> sol = FXCollections.observableArrayList("yyyy_MM", "", "yyyy_MM_dd");
@@ -1029,11 +1109,13 @@ public class SSController {
 
     // handle window events here in the controller so we have access to
     // All the items and methods of the window. At last at WINDOW_SHOW and beyond.
+    // The only one we need here is the WINDOW_CLOSE_REQUEST which catches the
+    // X on the window title bar. I'm not aware of anything else that catches this.
     public void handleWindowEvent(WindowEvent event) {
         EventType<WindowEvent> state = event.getEventType();
         if (state == WINDOW_SHOWN) {
             printSysOut("Window shown");
-            OnWindowShown(event);
+            //OnWindowShown(event);
         }
         else if (state == WINDOW_HIDING) {
             printSysOut("Window hiding");
@@ -1177,7 +1259,7 @@ public class SSController {
         /*
             Update the pairs list in the ListView
          */
-            lvScreenShotPairs.setItems(listPairs);
+            tvPairsTable.setItems(listPairs);
         }
 
         //sbImageListScrollBar.setDisable( !sbImageListScrollBar.isDisable() );
@@ -1278,6 +1360,17 @@ public class SSController {
     }
 
     /*
+        Clear the images to avoid conflicts
+     */
+    private void ClearImageDisplay() {
+        bImagesValid = false;
+        sImageList = new String[]{};
+        intImageIndex = 0;
+        ClearImage();
+    }
+
+
+    /*
         Scan the Source for files. Don't use the File Prefix in the Source
      */
     public void OnViewSource(ActionEvent actionEvent) {
@@ -1290,10 +1383,7 @@ public class SSController {
             intImageIndex = sImageList.length - 1;
             onGoImagesEnd( actionEvent );
         } else {
-            bImagesValid = false;
-            sImageList = sImageFileNames;
-            intImageIndex = 0;
-            ClearImage();
+            ClearImageDisplay();
         }
         setStatus(String.format("%d Source Images Found", sImageFileNames.length));
     }
@@ -1311,10 +1401,7 @@ public class SSController {
             intImageIndex = sImageList.length - 1;
             onGoImagesEnd( actionEvent );
         } else {
-            bImagesValid = false;
-            sImageList = sImageFileNames;
-            intImageIndex = 0;
-            ClearImage();
+            ClearImageDisplay();
 
         }
         setStatus(String.format("%d Destination Images Found", sImageFileNames.length));

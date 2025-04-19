@@ -17,6 +17,7 @@ public class SSApplication extends Application {
 
     public static final String ORGANIZATION = "windyweather";
     public static final String APPLICATIONNAME = "ScreenShotArchive";
+    public static final String APP_VERSION = "1.0.1";
 
 
     @Override

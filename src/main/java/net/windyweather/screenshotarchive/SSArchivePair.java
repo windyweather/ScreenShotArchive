@@ -1,6 +1,7 @@
 package net.windyweather.screenshotarchive;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.stage.Window;
 
@@ -140,5 +141,13 @@ public class SSArchivePair {
                 */
         );
 
+    }
+
+    public ObservableValue<String> sPairNameProperty() {
+        return  new SimpleStringProperty(sPairName);
+    }
+
+    public ObservableValue<String> sPairSourcePathProperty() {
+        return new SimpleStringProperty(sSourcePath);
     }
 }

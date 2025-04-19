@@ -80,7 +80,12 @@
                         </Label>
                         <HBox>
                             <children>
-                                <ListView fx:id="lvScreenShotPairs" onMouseClicked="#OnListViewMouseClicked" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                        <TableView fx:id="tvPairsTable" minHeight="-Infinity" onMouseClicked="#OnTableViewMouseClicked" prefHeight="150.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
+                          <columns>
+                            <TableColumn fx:id="tcPairName" editable="false" maxWidth="400.0" minWidth="50.0" prefWidth="200.0" sortable="false" text="Pair Name" />
+                            <TableColumn fx:id="tcPairSourcePath" editable="false" maxWidth="1000.0" prefWidth="605.3999786376953" sortable="false" text="Source Path" />
+                          </columns>
+                        </TableView>
                                 <VBox alignment="TOP_RIGHT">
                                     <children>
                                         <Button fx:id="btnMovePairTop" mnemonicParsing="false" onAction="#OnMovePairTop" text="Top" />

@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.apache.commons.io.FilenameUtils;
@@ -51,13 +52,6 @@ public class SSAFilesHelper {
             ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(ftModified.toInstant(), ZoneId.systemDefault());
                       DateTimeFormatter dtf = DateTimeFormatter.ofPattern(sDateFormat);
             sDateFolderPrefix = dtf.format(zonedDateTime);
-            //SSController.printSysOut( String.format("GetDateFolderPrefix - %s", sDateFolderPrefix ) );
-
-            /*
-            SimpleDateFormat df = new SimpleDateFormat(sDateFormat);
-            sDateFolderPrefix = df.format( ftModified );
-            */
-
         }
         return sDateFolderPrefix;
     }
@@ -73,7 +67,7 @@ public class SSAFilesHelper {
         Instant today = Instant.now();
         FileTime ftToday = FileTime.from(today);
         sFolderSfxToday = GetDateFolderPrefix( ftToday, sFolderSfxCode );
-        SSController.printSysOut(String.format("GetDayFolderSuffix of Today %s", sFolderSfxToday));
+        //SSController.printSysOut(String.format("GetDayFolderSuffix of Today %s", sFolderSfxToday));
 
         return sFolderSfxToday;
     }
@@ -119,20 +113,41 @@ public class SSAFilesHelper {
          */
         String sFileName = String.valueOf(aFilePath.getFileName());
         Path pDestinationFile = Paths.get(sDestAbsFilePathDir + File.separator + sFileName);
-        SSController.printSysOut(String.format("CopyPreservedSourceToDestination - Copy %s >> %s", 
-                aFilePath.toString(), pDestinationFile.toString()  ));
+        if ( false ) {
+            SSController.printSysOut(String.format("CopyPreservedSourceToDestination - Copy %s >> %s",
+                    aFilePath.toString(), pDestinationFile.toString()));
+        }
+
         /*
             Actually Copy the file.
          */
         // Try / Catch around the actual copy?
         try {
-            //Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
+            /*
+              Check if destination exists and return false if it does
+             */
+            File fileDestination = pDestinationFile.toFile();
+
+            if ( fileDestination.exists() ) {
+                if ( false ) {
+                    SSController.printSysOut(String.format("CopyPreservedSourceToDestination -Not Copied, Exists %s",
+                            pDestinationFile.toString()));
+                }
+                return false;
+            }
+            /*
+                Actually copy the file
+             */
+            Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
         } catch (Exception e) {
             //throw new RuntimeException(e);
+            SSController.printSysOut(String.format("CopyPreservedSourceToDestination - ERROR Copy %s >> %s",
+                    aFilePath.toString(), pDestinationFile.toString()  ));
             return false;
         }
-
-
+        /*
+            Whew. We copied the file. Hurray!
+         */
         return true;
     }
 
@@ -195,8 +210,10 @@ public class SSAFilesHelper {
          */
         File fDestinationFile = new File (String.valueOf(pDestinationFile.toAbsolutePath()));
         if ( fDestinationFile.exists() ) {
-            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Dest Exists Do Not Copy %s >> %s",
-                    aFilePath.toString(), pDestinationFile.toString()  ));
+            if ( false ) {
+                SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Dest Exists Do Not Copy %s >> %s",
+                        aFilePath.toString(), pDestinationFile.toString()));
+            }
             return false;
         }
         /*
@@ -208,15 +225,16 @@ public class SSAFilesHelper {
                 Actually copy the file. Maybe put a check for testing around this.
              */
             Files.copy( aFilePath, pDestinationFile, COPY_ATTRIBUTES);
-            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Copy %s >> %s",
-                    aFilePath.toString(), pDestinationFile.toString()  ));
+            if ( false ) {
+                SSController.printSysOut(String.format("CopyModifiedSourceToDestination - Copy %s >> %s",
+                        aFilePath.toString(), pDestinationFile.toString()));
+            }
         } catch (Exception e) {
             //throw new RuntimeException(e);
-            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - EXCEPTION on Copy %s >> %s",
-                    aFilePath.toString(), pDestinationFile.toString()  ));
+            SSController.printSysOut(String.format("CopyModifiedSourceToDestination - EXCEPTION %s on Copy %s >> %s",
+                    e.toString(), aFilePath.toString(), pDestinationFile.toString()  ));
             return false;
         }
-
 
         return true;
     }
@@ -292,12 +310,6 @@ public class SSAFilesHelper {
         return String.format("%d Files Copied, %d Files Skipped", iManyCopied, iManySkipped);
     };
 
-    /*
-        All image files [BMP, PNG, JPG] are deleted from the path. Subfolders are not disturbed.
-     */
-    private static boolean FileHelperDeleteFiles( String sFilePath ) {
-        return true;
-    };
 
     /*
         Delete image files from the supplied folder - presumably the Game Screenshot folder -
@@ -317,6 +329,8 @@ public class SSAFilesHelper {
         }
         String[] saIncludeImages = new String[]{sSubPfx + "*.bmp", sSubPfx + "*.jpg", sSubPfx + "*.png"};
 
+        SSController.printSysOut(String.format("FileHelperCleanSource Search String: %s", Arrays.toString(saIncludeImages)) );
+
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setIncludes(saIncludeImages);
         scanner.setCaseSensitive(false);
@@ -332,6 +346,7 @@ public class SSAFilesHelper {
 
         for (String sSourceFile : sSourceFiles) {
             String sSourceAbsFilePath = sSourcePath + File.separator + sSourceFile;
+            SSController.printSysOut(String.format("FileHelperCleanSource Deleting File: %s", sSourceAbsFilePath) );
             /*
                 Delete the file from Source Game Screen Shot folder
              */
@@ -339,6 +354,8 @@ public class SSAFilesHelper {
                 File fSourceFile = new File(sSourceAbsFilePath);
                 if (fSourceFile.delete()) {
                     iManyDeleted++;
+                } else {
+                    SSController.printSysOut(String.format("FileHelperCleanSource Problem Deleting File: %s", sSourceAbsFilePath) );
                 }
 
             } catch (Exception e) {
