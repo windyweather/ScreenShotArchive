@@ -1,7 +1,5 @@
 package net.windyweather.screenshotarchive;
 
-import org.codehaus.plexus.util.DirectoryScanner;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.apache.commons.io.FilenameUtils;
 
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
