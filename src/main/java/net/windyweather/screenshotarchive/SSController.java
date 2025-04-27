@@ -546,6 +546,16 @@ public class SSController {
         stage.setResizable(false);
         stage.initOwner( stageOfUs );
 
+        try {
+            javafx.scene.image.Image imgIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("games-icon.png")) );
+            stage.getIcons().add(imgIcon);
+            printSysOut("About window Icon Set");
+
+        } catch ( Exception e ) {
+            printSysOut("Error setting about window icon");
+            printSysOut( e.toString() );
+        }
+
 
         printSysOut("onAbout - show about dialog");
         stage.show();
@@ -1111,7 +1121,7 @@ public class SSController {
     // All the items and methods of the window. At last at WINDOW_SHOW and beyond.
     // The only one we need here is the WINDOW_CLOSE_REQUEST which catches the
     // X on the window title bar. I'm not aware of anything else that catches this.
-    public void handleWindowEvent(WindowEvent event) {
+    public void handleWindowEventxxx(WindowEvent event) {
         EventType<WindowEvent> state = event.getEventType();
         if (state == WINDOW_SHOWN) {
             printSysOut("Window shown");

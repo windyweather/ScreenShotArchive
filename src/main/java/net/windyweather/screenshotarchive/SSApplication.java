@@ -4,10 +4,12 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import static net.windyweather.screenshotarchive.SSController.printSysOut;
@@ -28,17 +30,27 @@ public class SSApplication extends Application {
         stage.setScene(scene);
 
         /*
+            Stick a program icon on the window
+         */
+        printSysOut("Icon Setup");
+        try {
+            Image imgIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("games-icon.png")) );
+            stage.getIcons().add(imgIcon);
+            printSysOut("Icon Set");
+
+        } catch ( Exception e ) {
+            printSysOut("Error setting icon");
+            printSysOut( e.toString() );
+        }
+
+        /*
             get the controller so we can call it with window events
             This is needed when the app is closed with the X at the top right of the window
          */
         SSController ssCtrl;
         ssCtrl = (SSController) fxmlLoader.getController();
-        stage.addEventHandler( WindowEvent.ANY, new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                ssCtrl.handleWindowEvent(event);
-            }
-        });
+
+        stage.setOnHiding( e->ssCtrl.AppCloseStuffToDo() );
         stage.show();
 
         /*

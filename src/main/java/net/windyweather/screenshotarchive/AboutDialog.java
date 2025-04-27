@@ -7,14 +7,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Objects;
 
 import static java.awt.event.WindowEvent.WINDOW_ACTIVATED;
 import static javafx.stage.WindowEvent.*;
+import static net.windyweather.screenshotarchive.SSController.printSysOut;
 
 public class AboutDialog {
     public Label lblSSAVersion;
@@ -56,13 +59,22 @@ public class AboutDialog {
             Put the version number in the dialog
          */
         lblSSAVersion.setText( "Version " + SSApplication.APP_VERSION);
+
     }
 
     /*
         During Initialize, fix up the text area.
      */
     @FXML
-    void initialize(){
+
+    public void start( Stage stage ) {
+
+    printSysOut("About Start called");
+
+    }
+
+
+    public void initialize(){
         SetStuffUp();
     }
 
