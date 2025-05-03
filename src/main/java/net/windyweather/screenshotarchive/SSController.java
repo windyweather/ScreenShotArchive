@@ -200,16 +200,18 @@ public class SSController {
         try {
             //assert selectedImageFile != null;
             imageAsStream = new FileInputStream(selectedImageFile);
-        } catch (FileNotFoundException e) {
+            anImage = new Image(imageAsStream);
+            imageAsStream.close();
+        } catch (IOException e) {
             printSysOut("Somehow, image file not found");
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
         }
         /*
             Fire up the image in the GUI
             Turn the imageview back on in cased it was turned off
          */
         imgImageView.setVisible( true );
-        anImage = new Image( imageAsStream );
+
         imgImageView.setImage( anImage );
 
         imgImageView.setPreserveRatio(true);
@@ -324,6 +326,21 @@ public class SSController {
         /*
             clear the image we are looking at. Don't change anything else
          */
+        /*
+            Try to close out any open image in the view by trashing the existing image by
+            reading the icon image.
+         */
+        if ( false ) {
+            try {
+                anImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("games-icon.png")));
+                printSysOut("Icon read");
+
+            } catch (Exception e) {
+                printSysOut("Error setting icon");
+                printSysOut(e.toString());
+            }
+        }
+
         imgImageView.setVisible( false );
         imgImageView.setImage( generateImage() );
         lblImageName.setText("");
@@ -567,7 +584,7 @@ public class SSController {
     }
 
 
-    public void onGoImagesStart(ActionEvent actionEvent) {
+    public void onGoImagesStart(ActionEvent actionEvent)  {
         if ( bImagesValid ) {
             intImageIndex = 0;
             OpenImageFromList();
@@ -1005,6 +1022,7 @@ public class SSController {
             setStatus( "Delete canceled");
             return;
         }
+
         /*
             Any open image will not be deleted
             so forget the display to allow all files to be deleted.
