@@ -326,20 +326,6 @@ public class SSController {
         /*
             clear the image we are looking at. Don't change anything else
          */
-        /*
-            Try to close out any open image in the view by trashing the existing image by
-            reading the icon image.
-         */
-        if ( false ) {
-            try {
-                anImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("games-icon.png")));
-                printSysOut("Icon read");
-
-            } catch (Exception e) {
-                printSysOut("Error setting icon");
-                printSysOut(e.toString());
-            }
-        }
 
         imgImageView.setVisible( false );
         imgImageView.setImage( generateImage() );
