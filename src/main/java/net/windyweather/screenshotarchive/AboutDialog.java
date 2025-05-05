@@ -8,6 +8,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -40,6 +41,9 @@ public class AboutDialog {
             };
 
 
+    public ImageView ivIcon;
+
+
     /*
         Wait until the window is "Shown" before we load up the TextArea with the content above.
         Before that it won't take. Like the TextArea doesn't fully exist or something.
@@ -59,6 +63,20 @@ public class AboutDialog {
             Put the version number in the dialog
          */
         lblSSAVersion.setText( "Version " + SSApplication.APP_VERSION);
+
+                /*
+            Stick a program icon on the window
+         */
+        printSysOut("About Icon Setup");
+        try {
+            Image imgIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("games-icon.png")) );
+            ivIcon.setImage( imgIcon );
+            printSysOut("About dialog icon set");
+
+        } catch ( Exception e ) {
+            printSysOut("Error setting icon");
+            printSysOut( e.toString() );
+        }
 
     }
 

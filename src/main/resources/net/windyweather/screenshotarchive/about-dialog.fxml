@@ -2,29 +2,36 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Pane minHeight="400.0" minWidth="500.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.AboutDialog">
-        <VBox alignment="TOP_CENTER">
+<Pane minHeight="420.0" minWidth="500.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.windyweather.screenshotarchive.AboutDialog">
+        <VBox alignment="TOP_CENTER" minHeight="440.0" prefHeight="440.0" prefWidth="500.0">
                <children>
-                  <Label alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" text="Screen Shot Archive" textAlignment="CENTER">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-            <padding>
-               <Insets bottom="20.0" top="20.0" />
-            </padding>
-            <VBox.margin>
-               <Insets />
-            </VBox.margin>
-                  </Label>
+         <HBox prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <ImageView fx:id="ivIcon" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
+                  <HBox.margin>
+                     <Insets left="100.0" right="20.0" top="20.0" />
+                  </HBox.margin>
+               </ImageView>
+                        <Label alignment="TOP_CENTER" text="Screen Shot Archive" textAlignment="CENTER">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                  <padding>
+                     <Insets bottom="20.0" top="50.0" />
+                  </padding>
+                        </Label>
+            </children>
+         </HBox>
                   <Label fx:id="lblSSAVersion" alignment="TOP_CENTER" text="Version: 1.0.0">
                      <font>
                         <Font size="14.0" />
                      </font>
             <padding>
-               <Insets bottom="20.0" />
+               <Insets bottom="20.0" top="10.0" />
             </padding>
                   </Label>
          <TextArea fx:id="taAboutText" editable="false" minWidth="500.0" prefWidth="200.0" text="Screen Shot Archive is a program to manage, view and backup screenshots from all the games you play.The model is that each game stores screen shots in folders in various places, including in various subfolders of your home folder:C:\Users\Yournamehere\OneDrive\Documents\game\screens or inSomeSSD:\GameCompany\GameFolder\ScreenShots.So with these game folders all over the place how to do you conveniently:1 - View the files.2 - Backup the files to a common place.3 - Organize them so you can easily find them by date over the years that you play.4 - Rename the files so you can find the files by game name. Renaming is optional.See more at the link below:" wrapText="true" />
